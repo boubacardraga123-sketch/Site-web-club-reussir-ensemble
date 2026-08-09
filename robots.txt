@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://boubacardraga123-sketch.github.io/Site-web-club-reussir-ensemble/sitemap.xml
