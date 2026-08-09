@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16213e">
+<meta name="description" content="Club Réussir Ensemble — Événements, galerie, vidéos et inscriptions. Club éducatif basé à Mamou, Guinée, sous la devise Rigueur · Discipline · Travail.">
+<title>Club Réussir Ensemble — Mamou, Guinée</title>
+<link rel="canonical" href="https://boubacardraga123-sketch.github.io/Site-web-club-reussir-ensemble/">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CRE">
+
+<!-- Indexation Google -->
+<meta name="robots" content="index, follow">
+
+<!-- Partage réseaux sociaux / aperçus de liens (Facebook, WhatsApp, etc.) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Club Réussir Ensemble — Mamou, Guinée">
+<meta property="og:description" content="Événements, galerie, vidéos et inscriptions du Club Réussir Ensemble. Rigueur · Discipline · Travail.">
+<meta property="og:url" content="https://boubacardraga123-sketch.github.io/Site-web-club-reussir-ensemble/">
+<meta property="og:image" content="https://boubacardraga123-sketch.github.io/Site-web-club-reussir-ensemble/icon-512.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Club Réussir Ensemble — Mamou, Guinée">
+<meta name="twitter:description" content="Événements, galerie, vidéos et inscriptions du Club Réussir Ensemble.">
+<meta name="twitter:image" content="https://boubacardraga123-sketch.github.io/Site-web-club-reussir-ensemble/icon-512.png">
+
+<!-- Données structurées pour Google (aide à comprendre le site) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Club Réussir Ensemble",
+  "url": "https://boubacardraga123-sketch.github.io/Site-web-club-reussir-ensemble/",
+  "logo": "https://boubacardraga123-sketch.github.io/Site-web-club-reussir-ensemble/icon-512.png",
+  "description": "Club éducatif à Mamou, Guinée — Événements, galerie, vidéos et inscriptions.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Mamou",
+    "addressCountry": "GN"
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;0,900;1,600&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16213e; --ink2:#3b4568;
+  --paper:#f6f2e7; --paper2:#ece4cf;
+  --red:#c1272d; --gold:#b6901f;
+  --line: rgba(22,33,62,.16);
+  --line-soft: rgba(22,33,62,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--paper2);
+  font-family:'Work Sans',sans-serif;color:var(--ink);min-height:100vh;
+}
+h1,h2,h3{font-family:'Fraunces',serif;color:var(--ink);line-height:1.08}
+.hidden{display:none!important}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+a{color:inherit}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--ink);color:var(--paper);padding:14px 0}
+.topbar .row{display:flex;align-items:center;gap:12px}
+.brand-seal{width:44px;height:44px;border-radius:50%;border:2px dashed var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-weight:700;font-size:13px;color:var(--gold);flex-shrink:0}
+.brand-txt{flex:1;min-width:0}
+.brand-txt .n{font-family:'Fraunces',serif;font-weight:700;font-size:16px}
+.brand-txt .m{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#9aa4c7;margin-top:1px}
+.admin-link{font-family:'Space Mono',monospace;font-size:10px;color:#7c86ab;text-decoration:none;border:1px solid #3b4568;border-radius:6px;padding:5px 9px;white-space:nowrap}
+
+/* ── BINDER TABS ── */
+.site-nav{display:flex;gap:5px;overflow-x:auto;padding-top:14px}
+.site-nav button{background:var(--paper2);border:1.5px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;padding:10px 15px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);cursor:pointer;white-space:nowrap;transform:translateY(3px);transition:transform .15s,background .15s,color .15s}
+.site-nav button.active{background:var(--paper);color:var(--ink);transform:translateY(0);box-shadow:0 -2px 6px rgba(22,33,62,.08)}
+.site-body{background:var(--paper);border-top:1.5px solid var(--line);min-height:60vh;padding:28px 0 60px}
+.rule-lines{background-image:repeating-linear-gradient(180deg, transparent, transparent 27px, var(--line-soft) 28px)}
+
+/* ── STAMP ── */
+.stamp{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;border:2px dashed currentColor;transform:rotate(-7deg);font-family:'Space Mono',monospace;line-height:1;flex-shrink:0}
+.stamp .d{font-size:19px;font-weight:700}
+.stamp .m{font-size:8.5px;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.stamp.gold{color:var(--gold)} .stamp.red{color:var(--red)} .stamp.ink{color:var(--ink2)}
+
+/* ── HERO ── */
+.hero{padding:34px 0 26px;text-align:center}
+.hero .motto-stamp{display:inline-block;border:2px dashed var(--red);color:var(--red);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:6px 16px;border-radius:30px;transform:rotate(-2deg);margin-bottom:16px}
+.hero h1{font-size:clamp(28px,6vw,46px);font-style:italic;font-weight:700;max-width:620px;margin:0 auto}
+.hero p.lead{max-width:520px;margin:14px auto 0;color:var(--ink2);font-size:14.5px;line-height:1.6}
+.hero-actions{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+
+/* ── BUTTONS ── */
+.btn{padding:11px 18px;border-radius:8px;border:none;font-weight:700;cursor:pointer;font-family:'Work Sans',sans-serif;font-size:13.5px;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn-red{background:var(--red);color:#fff}
+.btn-ink{background:var(--ink);color:var(--paper)}
+.btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:7px}
+.btn:active{opacity:.82}
+
+/* ── VISION & VALEURS ── */
+.apropos-block{display:flex;gap:24px;flex-wrap:wrap;margin:30px 0 36px;padding:20px 0;border-top:1.5px dashed var(--line);border-bottom:1.5px dashed var(--line)}
+.apropos-col{flex:1;min-width:220px}
+.apropos-txt{font-size:14px;color:var(--ink2);line-height:1.65}
+
+/* ── SECTION HEAD ── */
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.sec-head h2{font-size:22px}
+.sec-head .eyebrow{font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+
+/* ── EVENT CARDS ── */
+.evt-list{display:flex;flex-direction:column;gap:12px}
+.evt-card{display:flex;gap:14px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px;box-shadow:0 2px 8px rgba(22,33,62,.06)}
+.evt-card .txt{flex:1;min-width:0}
+.evt-card .txt h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.evt-card .txt .meta{font-family:'Space Mono',monospace;font-size:11px;color:var(--ink2);margin-bottom:6px}
+.evt-card .txt p{font-size:13px;color:var(--ink2);line-height:1.5}
+.evt-card .txt .lnk{margin-top:8px}
+.empty-note{text-align:center;color:var(--ink2);font-size:13.5px;padding:30px 10px;border:1.5px dashed var(--line);border-radius:8px}
+
+/* ── GALLERY ── */
+.gallery-grid{column-count:2;column-gap:14px}
+@media(min-width:640px){.gallery-grid{column-count:3}}
+.gallery-item{position:relative;break-inside:avoid;margin-bottom:16px;background:#fff;padding:7px 7px 12px;box-shadow:0 4px 12px rgba(22,33,62,.14);cursor:pointer}
+.gallery-item img{width:100%;display:block;background:var(--paper2)}
+.gallery-item .cap{font-size:11px;color:var(--ink2);margin-top:6px;padding:0 2px;font-family:'Space Mono',monospace}
+.gallery-item::before{content:'';position:absolute;top:-9px;left:50%;transform:translateX(-50%) rotate(-3deg);width:54px;height:20px;background:rgba(182,144,31,.32);border:1px solid rgba(182,144,31,.5)}
+.lightbox{position:fixed;inset:0;background:rgba(22,33,62,.92);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:20px}
+.lightbox img{max-width:92vw;max-height:78vh;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.lightbox .cap{color:var(--paper);font-family:'Space Mono',monospace;font-size:12px}
+.lightbox .close{position:absolute;top:16px;right:16px;background:none;border:1.5px solid var(--paper);color:var(--paper);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer}
+
+/* ── VIDEOS ── */
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.video-card{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden;box-shadow:0 2px 8px rgba(22,33,62,.06)}
+.video-card .frame{position:relative;aspect-ratio:16/9;background:#000}
+.video-card .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-card .info{padding:10px 12px}
+.video-card .info h3{font-size:13.5px;font-weight:700}
+.video-card .info p{font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.4}
+
+/* ── FICHE FORM ── */
+.fiche{background:#fff;border:3px double var(--ink);border-radius:4px;padding:22px 20px;max-width:520px;margin:0 auto;position:relative}
+.fiche .fiche-head{text-align:center;margin-bottom:18px}
+.fiche .fiche-head .tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.fiche .fiche-head h2{font-size:20px;margin-top:4px}
+label.f-label{display:block;font-size:11.5px;font-weight:700;color:var(--ink2);margin-bottom:4px;margin-top:14px;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
+.fiche input,.fiche select,.fiche textarea{width:100%;padding:10px 11px;border:none;border-bottom:1.5px solid var(--line);background:transparent;font-size:14px;font-family:'Work Sans',sans-serif;outline:none;border-radius:0}
+.fiche input:focus,.fiche select:focus,.fiche textarea:focus{border-bottom-color:var(--red)}
+.fiche textarea{resize:vertical;min-height:60px}
+.confirm-box{text-align:center;padding:20px 10px}
+.confirm-box .stamp{width:96px;height:96px;margin:0 auto 14px}
+.confirm-box .stamp .d{font-size:24px}
+
+/* ── FOOTER ── */
+.site-footer{background:var(--ink);color:#9aa4c7;padding:22px 0;text-align:center;font-size:12px}
+.site-footer strong{color:var(--paper)}
+
+/* ── ADMIN ── */
+.admin-shell{background:var(--paper2);min-height:100vh;padding-bottom:40px}
+.admin-top{background:var(--ink);color:var(--paper);padding:14px 0}
+.admin-top .row{display:flex;align-items:center;gap:10px}
+.admin-top h1{color:var(--paper);font-size:16px;flex:1}
+.admin-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0}
+.admin-tabs button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 13px;font-weight:700;font-size:12px;cursor:pointer;color:var(--ink2);white-space:nowrap}
+.admin-tabs button.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.a-card{background:#fff;border-radius:8px;padding:16px;margin-bottom:14px;border:1px solid var(--line)}
+.a-card h3{font-size:14.5px;margin-bottom:12px}
+.a-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.a-row:last-child{border-bottom:none}
+.a-row .main{flex:1;min-width:160px}
+.a-row .main .t1{font-weight:700;font-size:13px}
+.a-row .main .t2{font-size:11.5px;color:var(--ink2);margin-top:1px}
+.chip{font-size:10px;font-weight:700;border-radius:20px;padding:2px 9px;white-space:nowrap;font-family:'Space Mono',monospace}
+.chip-new{background:#fdecea;color:var(--red)}
+.chip-contact{background:#fdf3e0;color:var(--gold)}
+.chip-done{background:#e6f4ea;color:#1e7e34}
+input.a-in,select.a-in,textarea.a-in{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:'Work Sans',sans-serif;outline:none;margin-top:4px}
+input.a-in:focus,select.a-in:focus,textarea.a-in:focus{border-color:var(--ink)}
+label.a-label{display:block;font-size:11.5px;font-weight:700;color:var(--ink2);margin-top:10px}
+
+/* ── LOGIN / MISC ── */
+.center-box{max-width:380px;margin:70px auto;text-align:center;padding:0 16px}
+.center-box .stamp{width:80px;height:80px;margin:0 auto 16px}
+.center-box p{color:var(--ink2);font-size:13.5px;margin-top:8px;line-height:1.5}
+.center-box input{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:14px;margin-top:16px;text-align:center;font-family:'Space Mono',monospace;letter-spacing:.1em}
+.spinner{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite;margin:30px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:11px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity .25s}
+.toast.show{opacity:1}
+/* ── MOBILE (téléphone) ── */
+@media(max-width:480px){
+  .wrap{padding:0 12px}
+  .topbar{padding:12px 0}
+  .topbar .row{flex-wrap:wrap}
+  .brand-txt .n{font-size:14.5px}
+  .site-nav button{padding:9px 12px;font-size:10.5px}
+  .hero{padding:26px 0 18px}
+  .hero .lead{font-size:14px}
+  .hero-actions{flex-direction:column;align-items:stretch}
+  .hero-actions .btn{width:100%;justify-content:center}
+  .evt-card{flex-direction:column;align-items:flex-start;padding:13px}
+  .evt-card .stamp{margin-bottom:8px}
+  .video-grid{grid-template-columns:1fr}
+  .fiche{padding:18px 15px}
+  .sec-head h2{font-size:19px}
+}
+@media(max-width:380px){
+  .gallery-grid{column-count:1}
+}
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+<div id="app"><div class="spinner"></div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc,
+         deleteDoc, updateDoc, query, orderBy, onSnapshot
+       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ── Même projet Firebase que les autres apps du Club (emploi-temps) ── */
+const firebaseConfig = {
+  apiKey: "AIzaSyBYeYPOptN2wEak_Ctcr4a8t5qXpj4riLE",
+  authDomain: "emploi-temps.firebaseapp.com",
+  projectId: "emploi-temps",
+  storageBucket: "emploi-temps.firebasestorage.app",
+  messagingSenderId: "665985283894",
+  appId: "1:665985283894:web:b0c4cb14824bb8fed9a597"
+};
+const fbApp = initializeApp(firebaseConfig);
+const fbDB  = getFirestore(fbApp);
+
+/* ── Code d'accès admin — à modifier ── */
+const ADMIN_CODE = "REUSSIR2026";
+
+/* ── Collections ── */
+const C_EVT   = 'site_evenements';
+const C_GAL   = 'site_galerie';
+const C_VID   = 'site_videos';
+const C_INSC  = 'site_inscriptions';
+const C_CONFIG = 'site_config';
+
+/* ── Emblème du club : livre ouvert dessiné en SVG (aucune image externe) ── */
+const BRAND_ICON = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M2 5.2c2.3-1 5-1.3 7-.1v13.2c-2-1.2-4.7-.9-7 .1z"/>
+  <path d="M22 5.2c-2.3-1-5-1.3-7-.1v13.2c2-1.2 4.7-.9 7 .1z"/>
+  <path d="M12 5.5v12.9"/>
+</svg>`;
+
+const app = document.getElementById('app');
+let toastTimeout;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+function esc(s){ return (s??'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDay(ts){ return new Date(ts).toLocaleDateString('fr-FR',{day:'2-digit'}); }
+function fmtMon(ts){ return new Date(ts).toLocaleDateString('fr-FR',{month:'short'}).replace('.',''); }
+function fmtFull(ts){ return new Date(ts).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'}); }
+function ytId(url){
+  if(!url) return '';
+  const m = url.match(/(?:youtu\.be\/|v=|embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : url.trim();
+}
+function waLink(tel){
+  let d = (tel||'').replace(/\D/g,'');
+  if(d.length===9) d = '224'+d;
+  return `https://wa.me/${d}`;
+}
+
+/* ══════════════════════════════ ROUTAGE ══════════════════════════════ */
+const params = new URLSearchParams(location.search);
+if (params.get('admin') === '1') {
+  bootAdmin();
+} else {
+  bootSite();
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+
+/* ══════════════════════════════ SITE PUBLIC ══════════════════════════════ */
+let siteTab = 'accueil';
+let events = [], gallery = [], videos = [];
+let siteConfig = {};
+let unsubs = [];
+
+function bootSite(){
+  app.innerHTML = `
+    <div class="topbar"><div class="wrap row">
+      <div class="brand-seal">CRE</div>
+      <div class="brand-txt">
+        <div class="n">Club Réussir Ensemble</div>
+        <div class="m">Rigueur · Discipline · Travail</div>
+      </div>
+    </div>
+    <div class="wrap"><div class="site-nav" id="siteNav"></div></div>
+    </div>
+    <div class="site-body"><div class="wrap" id="siteBody"><div class="spinner"></div></div></div>
+    <div class="site-footer">Un projet de <strong>Club Réussir Ensemble</strong> — Mamou, Guinée<br><span style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase">Rigueur · Discipline · Travail</span></div>`;
+  paintNav();
+  listenAll();
+  wireAdminTrigger();
+}
+
+let sealClicks = 0, sealClickTimer, sealLastTap = 0;
+function wireAdminTrigger(){
+  const seal = document.querySelector('.topbar .brand-seal');
+  if(!seal) return;
+  seal.style.cursor = 'pointer';
+  seal.style.touchAction = 'manipulation'; // évite le double-tap zoom
+  seal.style.position = 'relative';
+  // zone de tap invisible plus grande que le rond visible, plus facile à toucher
+  const hit = document.createElement('div');
+  hit.style.cssText = 'position:absolute;inset:-14px;';
+  seal.appendChild(hit);
+
+  const trigger = (e)=>{
+    if(e) e.preventDefault();
+    const now = Date.now();
+    if(now - sealLastTap > 3000){ sealClicks = 0; }
+    sealLastTap = now;
+    sealClicks++;
+    clearTimeout(sealClickTimer);
+    sealClickTimer = setTimeout(()=>{ sealClicks = 0; }, 3000);
+    toast(`🔒 ${sealClicks}/5`);
+    if(sealClicks >= 5){
+      sealClicks = 0;
+      location.href = location.pathname + '?admin=1';
+    }
+  };
+
+  // pointerup couvre tactile + souris en un seul événement, plus fiable que touchend/click séparés
+  hit.addEventListener('pointerup', trigger);
+  seal.addEventListener('pointerup', trigger);
+}
+
+function paintNav(){
+  const tabs = [['accueil','Accueil'],['evenements','Événements'],['galerie','Galerie'],['videos','Vidéos'],['inscription','Inscription']];
+  document.getElementById('siteNav').innerHTML = tabs.map(([k,l])=>
+    `<button class="${siteTab===k?'active':''}" data-tab="${k}">${l}</button>`).join('');
+  document.getElementById('siteNav').querySelectorAll('button').forEach(b=>{
+    b.onclick = ()=>{ siteTab = b.dataset.tab; paintNav(); renderSiteTab(); };
+  });
+}
+
+function listenAll(){
+  unsubs.push(onSnapshot(doc(fbDB, C_CONFIG, 'apropos'), snap=>{
+    siteConfig = snap.exists() ? snap.data() : {};
+    if(siteTab==='accueil') renderSiteTab();
+  }));
+  unsubs.push(onSnapshot(query(collection(fbDB, C_EVT), orderBy('date','desc')), snap=>{
+    events = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(siteTab==='accueil'||siteTab==='evenements') renderSiteTab();
+  }));
+  unsubs.push(onSnapshot(query(collection(fbDB, C_GAL), orderBy('createdAt','desc')), snap=>{
+    gallery = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(siteTab==='accueil'||siteTab==='galerie') renderSiteTab();
+  }));
+  unsubs.push(onSnapshot(query(collection(fbDB, C_VID), orderBy('createdAt','desc')), snap=>{
+    videos = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(siteTab==='accueil'||siteTab==='videos') renderSiteTab();
+  }));
+}
+
+function renderSiteTab(){
+  const body = document.getElementById('siteBody');
+  if(!body) return;
+  if(siteTab==='accueil') body.innerHTML = tplAccueil();
+  else if(siteTab==='evenements') body.innerHTML = tplEvenements();
+  else if(siteTab==='galerie') body.innerHTML = tplGalerie();
+  else if(siteTab==='videos') body.innerHTML = tplVideos();
+  else if(siteTab==='inscription') body.innerHTML = tplInscription();
+  wireSiteBody();
+}
+
+function tplAccueil(){
+  const upcoming = events.slice(0,2);
+  const hasApropos = (siteConfig.vision||'').trim() || (siteConfig.valeurs||'').trim();
+  return `
+  <div class="hero">
+    <div class="motto-stamp">Rigueur · Discipline · Travail</div>
+    <h1>Un cahier commun, pour réussir ensemble.</h1>
+    <p class="lead">Le Club Réussir Ensemble accompagne les élèves de Mamou vers la réussite : séances de renforcement, suivi personnalisé et un rendez-vous régulier avec l'effort bien fait.</p>
+    <div class="hero-actions">
+      <button class="btn btn-red" data-tab="inscription">✍️ S'inscrire au club</button>
+      <button class="btn btn-outline" data-tab="evenements">📅 Voir les événements</button>
+    </div>
+  </div>
+  ${hasApropos ? `
+  <div class="apropos-block">
+    ${(siteConfig.vision||'').trim() ? `
+    <div class="apropos-col">
+      <div class="sec-head"><div><div class="eyebrow">Pourquoi ce club</div><h2>Notre vision</h2></div></div>
+      <p class="apropos-txt">${esc(siteConfig.vision).replace(/\n/g,'<br>')}</p>
+    </div>` : ''}
+    ${(siteConfig.valeurs||'').trim() ? `
+    <div class="apropos-col">
+      <div class="sec-head"><div><div class="eyebrow">Ce qui nous guide</div><h2>Nos valeurs</h2></div></div>
+      <p class="apropos-txt">${esc(siteConfig.valeurs).replace(/\n/g,'<br>')}</p>
+    </div>` : ''}
+  </div>` : ''}
+  <div class="sec-head" style="margin-top:10px"><div><div class="eyebrow">À l'affiche</div><h2>Prochains événements</h2></div></div>
+  ${upcoming.length ? `<div class="evt-list">${upcoming.map(evtCard).join('')}</div>` : `<div class="empty-note">Aucun événement publié pour le moment.</div>`}
+  <div class="sec-head" style="margin-top:34px"><div><div class="eyebrow">En images</div><h2>Dernières photos</h2></div></div>
+  ${gallery.length ? `<div class="gallery-grid">${gallery.slice(0,6).map(galItem).join('')}</div>` : `<div class="empty-note">Galerie bientôt en ligne.</div>`}`;
+}
+
+function evtCard(e){
+  return `<div class="evt-card">
+    <div class="stamp ${e.style||'ink'}"><div class="d">${fmtDay(e.date)}</div><div class="m">${fmtMon(e.date)}</div></div>
+    <div class="txt">
+      <h3>${esc(e.titre)}</h3>
+      <div class="meta">📍 ${esc(e.lieu||'À préciser')} · ${fmtFull(e.date)}</div>
+      <p>${esc(e.description||'')}</p>
+      ${e.lien ? `<div class="lnk"><a class="btn btn-outline btn-sm" href="${esc(e.lien)}" target="_blank" rel="noopener">Plus d'infos</a></div>` : ''}
+    </div>
+  </div>`;
+}
+
+function tplEvenements(){
+  return `
+  <div class="sec-head"><div><div class="eyebrow">Calendrier</div><h2>Événements du club</h2></div></div>
+  ${events.length ? `<div class="evt-list">${events.map(evtCard).join('')}</div>` : `<div class="empty-note">Aucun événement publié pour le moment.</div>`}`;
+}
+
+function galItem(g,i){
+  const r = [-2,1.5,-1,2,-1.5,1][i%6];
+  return `<div class="gallery-item" style="--r:${r}deg" data-url="${esc(g.url)}" data-cap="${esc(g.legende||'')}">
+    <img src="${esc(g.url)}" alt="${esc(g.legende||'Photo du club')}" loading="lazy">
+    ${g.legende ? `<div class="cap">${esc(g.legende)}</div>` : ''}
+  </div>`;
+}
+
+function tplGalerie(){
+  return `
+  <div class="sec-head"><div><div class="eyebrow">Souvenirs</div><h2>Galerie photo</h2></div></div>
+  ${gallery.length ? `<div class="gallery-grid">${gallery.map(galItem).join('')}</div>` : `<div class="empty-note">Aucune photo publiée pour le moment.</div>`}`;
+}
+
+function vidCard(v){
+  const id = v.youtubeId || ytId(v.url);
+  return `<div class="video-card">
+    <div class="frame"><iframe src="https://www.youtube.com/embed/${esc(id)}" title="${esc(v.titre)}" allowfullscreen loading="lazy"></iframe></div>
+    <div class="info"><h3>${esc(v.titre)}</h3>${v.description?`<p>${esc(v.description)}</p>`:''}</div>
+  </div>`;
+}
+
+function tplVideos(){
+  return `
+  <div class="sec-head"><div><div class="eyebrow">À revoir</div><h2>Vidéos du club</h2></div></div>
+  ${videos.length ? `<div class="video-grid">${videos.map(vidCard).join('')}</div>` : `<div class="empty-note">Aucune vidéo publiée pour le moment.</div>`}`;
+}
+
+function tplInscription(){
+  return `
+  <div class="fiche">
+    <div class="fiche-head"><div class="tag">Club Réussir Ensemble</div><h2>Fiche d'inscription</h2></div>
+    <form id="inscForm">
+      <label class="f-label">Nom</label><input type="text" name="nom" required>
+      <label class="f-label">Prénom</label><input type="text" name="prenom" required>
+      <label class="f-label">Téléphone (WhatsApp)</label><input type="tel" name="telephone" required placeholder="622 00 00 00">
+      <label class="f-label">Classe</label><input type="text" name="classe" required placeholder="ex : 10e Année">
+      <label class="f-label">Filière (si applicable)</label><input type="text" name="filiere" placeholder="SM, SS, ...">
+      <label class="f-label">Message (optionnel)</label><textarea name="message" placeholder="Une question, une remarque ?"></textarea>
+      <div style="margin-top:18px"><button type="submit" class="btn btn-red" style="width:100%;justify-content:center">Envoyer ma fiche</button></div>
+    </form>
+  </div>`;
+}
+
+function wireSiteBody(){
+  document.querySelectorAll('[data-tab]').forEach(el=>{
+    if(el.tagName==='BUTTON' && el.dataset.tab && el.closest('.hero')){
+      el.onclick = ()=>{ siteTab = el.dataset.tab; paintNav(); renderSiteTab(); };
+    }
+  });
+  document.querySelectorAll('.gallery-item').forEach(el=>{
+    el.onclick = ()=> openLightbox(el.dataset.url, el.dataset.cap);
+  });
+  const form = document.getElementById('inscForm');
+  if(form){
+    form.addEventListener('submit', async e=>{
+      e.preventDefault();
+      const fd = new FormData(form);
+      const data = {
+        nom: fd.get('nom').trim(), prenom: fd.get('prenom').trim(),
+        telephone: fd.get('telephone').trim(), classe: fd.get('classe').trim(),
+        filiere: (fd.get('filiere')||'').trim(), message: (fd.get('message')||'').trim(),
+        statut: 'nouveau', dateInscription: Date.now()
+      };
+      const btn = form.querySelector('button[type=submit]');
+      btn.disabled = true; btn.textContent = 'Envoi...';
+      try{
+        await addDoc(collection(fbDB, C_INSC), data);
+        document.getElementById('siteBody').innerHTML = `
+          <div class="confirm-box">
+            <div class="stamp red"><div class="d">✔</div><div class="m">Reçu</div></div>
+            <h2>Merci, ${esc(data.prenom)} !</h2>
+            <p>Votre fiche d'inscription a bien été reçue. Un formateur du club vous contactera très bientôt sur WhatsApp.</p>
+            <div class="hero-actions" style="margin-top:18px"><button class="btn btn-outline" data-tab="accueil" onclick="location.reload()">Retour à l'accueil</button></div>
+          </div>`;
+      }catch(err){ toast('❌ Erreur : '+err.message); btn.disabled=false; btn.textContent='Envoyer ma fiche'; }
+    });
+  }
+}
+
+function openLightbox(url, cap){
+  const lb = document.createElement('div');
+  lb.className = 'lightbox';
+  lb.innerHTML = `<button class="close">✕</button><img src="${esc(url)}">${cap?`<div class="cap">${esc(cap)}</div>`:''}`;
+  lb.onclick = e=>{ if(e.target===lb || e.target.classList.contains('close')) lb.remove(); };
+  document.body.appendChild(lb);
+}
+
+/* ══════════════════════════════ ESPACE ADMIN ══════════════════════════════ */
+function bootAdmin(){
+  const saved = sessionStorage.getItem('creAdminOK');
+  if(saved === '1'){ renderAdminShell(); return; }
+  app.innerHTML = `
+    <div class="center-box">
+      <div class="stamp ink"><div class="d">🔒</div></div>
+      <h2>Espace admin</h2>
+      <p>Entrez le code d'accès formateur pour gérer le contenu du site.</p>
+      <input type="password" id="codeIn" placeholder="Code d'accès" autofocus>
+      <div class="hero-actions" style="margin-top:14px"><button class="btn btn-ink" id="codeBtn">Entrer</button></div>
+    </div>`;
+  const go = ()=>{
+    const v = document.getElementById('codeIn').value.trim();
+    if(v === ADMIN_CODE){ sessionStorage.setItem('creAdminOK','1'); renderAdminShell(); }
+    else toast('❌ Code incorrect');
+  };
+  document.getElementById('codeBtn').onclick = go;
+  document.getElementById('codeIn').addEventListener('keydown', e=>{ if(e.key==='Enter') go(); });
+}
+
+let adminTab = 'evenements';
+function renderAdminShell(){
+  app.innerHTML = `
+    <div class="admin-shell">
+      <div class="admin-top"><div class="wrap row">
+        <div class="brand-seal">CRE</div>
+        <h1>Espace admin — Club Réussir Ensemble</h1>
+        <a class="admin-link" href="${location.pathname}" target="_self">Voir le site</a>
+      </div></div>
+      <div class="wrap">
+        <div class="admin-tabs" id="aTabs"></div>
+        <div id="aBody"></div>
+      </div>
+    </div>`;
+  paintATabs(); renderAdminTab();
+}
+function paintATabs(){
+  const tabs = [['apropos','📝 Vision & valeurs'],['evenements','📅 Événements'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['inscriptions','📋 Inscriptions']];
+  document.getElementById('aTabs').innerHTML = tabs.map(([k,l])=>`<button class="${adminTab===k?'active':''}" data-t="${k}">${l}</button>`).join('');
+  document.getElementById('aTabs').querySelectorAll('button').forEach(b=>{
+    b.onclick = ()=>{ adminTab=b.dataset.t; paintATabs(); renderAdminTab(); };
+  });
+}
+
+async function renderAdminTab(){
+  const body = document.getElementById('aBody');
+  body.innerHTML = '<div class="spinner"></div>';
+  if(adminTab==='apropos') return renderAdminApropos();
+  if(adminTab==='evenements') return renderAdminEvenements();
+  if(adminTab==='galerie') return renderAdminGalerie();
+  if(adminTab==='videos') return renderAdminVideos();
+  if(adminTab==='inscriptions') return renderAdminInscriptions();
+}
+
+/* ── Admin: Vision & valeurs ── */
+async function renderAdminApropos(){
+  const body = document.getElementById('aBody');
+  const snap = await getDoc(doc(fbDB, C_CONFIG, 'apropos'));
+  const data = snap.exists() ? snap.data() : {};
+  body.innerHTML = `
+    <div class="a-card">
+      <h3>📝 Vision & valeurs du club</h3>
+      <p style="font-size:12px;color:var(--ink2);margin-top:-4px">Ce texte est affiché publiquement sur la page d'accueil du site.</p>
+      <form id="aproposForm">
+        <label class="a-label">Notre vision</label>
+        <textarea class="a-in" name="vision" rows="5" placeholder="Pourquoi le club existe, ce qu'il veut accomplir...">${esc(data.vision||'')}</textarea>
+        <label class="a-label">Nos valeurs</label>
+        <textarea class="a-in" name="valeurs" rows="5" placeholder="Rigueur, discipline, travail... et ce que ça veut dire concrètement">${esc(data.valeurs||'')}</textarea>
+        <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Enregistrer</button></div>
+      </form>
+    </div>`;
+  document.getElementById('aproposForm').addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const payload = { vision: fd.get('vision').trim(), valeurs: fd.get('valeurs').trim(), updatedAt: Date.now() };
+    try{ await setDoc(doc(fbDB, C_CONFIG, 'apropos'), payload); toast('✅ Enregistré — visible sur le site'); }
+    catch(err){ toast('❌ '+err.message); }
+  });
+}
+
+/* ── Admin: Événements ── */
+async function renderAdminEvenements(){
+  const body = document.getElementById('aBody');
+  const snap = await getDocs(query(collection(fbDB, C_EVT), orderBy('date','desc')));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+  body.innerHTML = `
+    <div class="a-card">
+      <h3>➕ Nouvel événement</h3>
+      <form id="evtForm">
+        <label class="a-label">Titre</label><input class="a-in" name="titre" required>
+        <label class="a-label">Date</label><input class="a-in" type="date" name="date" required>
+        <label class="a-label">Lieu</label><input class="a-in" name="lieu" placeholder="ex : Siège du club, Mamou">
+        <label class="a-label">Description</label><textarea class="a-in" name="description" rows="3"></textarea>
+        <label class="a-label">Lien (WhatsApp, Facebook...) — optionnel</label><input class="a-in" name="lien" placeholder="https://...">
+        <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Publier</button></div>
+      </form>
+    </div>
+    <div class="a-card"><h3>Événements publiés (${list.length})</h3>
+      ${list.length ? list.map(e=>`
+        <div class="a-row">
+          <div class="main"><div class="t1">${esc(e.titre)}</div><div class="t2">${fmtFull(e.date)} · ${esc(e.lieu||'—')}</div></div>
+          <button class="btn btn-outline btn-sm" data-del="${e.id}">Supprimer</button>
+        </div>`).join('') : '<div class="empty-note">Aucun événement.</div>'}
+    </div>`;
+  document.getElementById('evtForm').addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const data = { titre: fd.get('titre').trim(), date: new Date(fd.get('date')).getTime(),
+      lieu: (fd.get('lieu')||'').trim(), description: (fd.get('description')||'').trim(),
+      lien: (fd.get('lien')||'').trim(), createdAt: Date.now() };
+    try{ await addDoc(collection(fbDB, C_EVT), data); toast('✅ Événement publié'); renderAdminEvenements(); }
+    catch(err){ toast('❌ '+err.message); }
+  });
+  body.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = async ()=>{ if(!confirm('Supprimer cet événement ?')) return;
+      await deleteDoc(doc(fbDB, C_EVT, b.dataset.del)); toast('🗑️ Supprimé'); renderAdminEvenements(); };
+  });
+}
+
+/* ── Admin: Galerie ── */
+async function renderAdminGalerie(){
+  const body = document.getElementById('aBody');
+  const snap = await getDocs(query(collection(fbDB, C_GAL), orderBy('createdAt','desc')));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+  body.innerHTML = `
+    <div class="a-card">
+      <h3>➕ Ajouter une photo</h3>
+      <p style="font-size:12px;color:var(--ink2);margin-top:-4px">Publiez d'abord la photo sur <strong>postimages.org</strong>, copiez le <strong>lien direct</strong> (Direct link), puis collez-le ici.</p>
+      <form id="galForm">
+        <label class="a-label">Lien direct de l'image (postimage)</label><input class="a-in" name="url" required placeholder="https://i.postimg.cc/...">
+        <label class="a-label">Légende — optionnel</label><input class="a-in" name="legende" placeholder="ex : Séance de renforcement, juillet 2026">
+        <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Ajouter à la galerie</button></div>
+      </form>
+    </div>
+    <div class="a-card"><h3>Photos publiées (${list.length})</h3>
+      ${list.length ? list.map(g=>`
+        <div class="a-row">
+          <img src="${esc(g.url)}" style="width:52px;height:52px;object-fit:cover;border-radius:6px;flex-shrink:0">
+          <div class="main"><div class="t1">${esc(g.legende||'Sans légende')}</div></div>
+          <button class="btn btn-outline btn-sm" data-del="${g.id}">Supprimer</button>
+        </div>`).join('') : '<div class="empty-note">Aucune photo.</div>'}
+    </div>`;
+  document.getElementById('galForm').addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const data = { url: fd.get('url').trim(), legende: (fd.get('legende')||'').trim(), createdAt: Date.now() };
+    try{ await addDoc(collection(fbDB, C_GAL), data); toast('✅ Photo ajoutée'); renderAdminGalerie(); }
+    catch(err){ toast('❌ '+err.message); }
+  });
+  body.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = async ()=>{ if(!confirm('Supprimer cette photo ?')) return;
+      await deleteDoc(doc(fbDB, C_GAL, b.dataset.del)); toast('🗑️ Supprimée'); renderAdminGalerie(); };
+  });
+}
+
+/* ── Admin: Vidéos ── */
+async function renderAdminVideos(){
+  const body = document.getElementById('aBody');
+  const snap = await getDocs(query(collection(fbDB, C_VID), orderBy('createdAt','desc')));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+  body.innerHTML = `
+    <div class="a-card">
+      <h3>➕ Ajouter une vidéo</h3>
+      <p style="font-size:12px;color:var(--ink2);margin-top:-4px">Collez le lien YouTube de la vidéo (ex : https://youtu.be/xxxxxxxxxxx).</p>
+      <form id="vidForm">
+        <label class="a-label">Titre</label><input class="a-in" name="titre" required>
+        <label class="a-label">Lien YouTube</label><input class="a-in" name="url" required placeholder="https://youtu.be/...">
+        <label class="a-label">Description — optionnel</label><textarea class="a-in" name="description" rows="2"></textarea>
+        <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Publier la vidéo</button></div>
+      </form>
+    </div>
+    <div class="a-card"><h3>Vidéos publiées (${list.length})</h3>
+      ${list.length ? list.map(v=>`
+        <div class="a-row">
+          <div class="main"><div class="t1">${esc(v.titre)}</div><div class="t2">${esc(v.youtubeId||'')}</div></div>
+          <button class="btn btn-outline btn-sm" data-del="${v.id}">Supprimer</button>
+        </div>`).join('') : '<div class="empty-note">Aucune vidéo.</div>'}
+    </div>`;
+  document.getElementById('vidForm').addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const data = { titre: fd.get('titre').trim(), youtubeId: ytId(fd.get('url').trim()),
+      description: (fd.get('description')||'').trim(), createdAt: Date.now() };
+    try{ await addDoc(collection(fbDB, C_VID), data); toast('✅ Vidéo publiée'); renderAdminVideos(); }
+    catch(err){ toast('❌ '+err.message); }
+  });
+  body.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = async ()=>{ if(!confirm('Supprimer cette vidéo ?')) return;
+      await deleteDoc(doc(fbDB, C_VID, b.dataset.del)); toast('🗑️ Supprimée'); renderAdminVideos(); };
+  });
+}
+
+/* ── Admin: Inscriptions ── */
+async function renderAdminInscriptions(){
+  const body = document.getElementById('aBody');
+  const snap = await getDocs(query(collection(fbDB, C_INSC), orderBy('dateInscription','desc')));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+  const chipClass = s => s==='inscrit' ? 'chip-done' : s==='contacté' ? 'chip-contact' : 'chip-new';
+  body.innerHTML = `
+    <div class="a-card"><h3>Fiches reçues (${list.length})</h3>
+      ${list.length ? list.map(r=>`
+        <div class="a-row">
+          <div class="main">
+            <div class="t1">${esc(r.nom)} ${esc(r.prenom)} <span class="chip ${chipClass(r.statut)}">${esc(r.statut||'nouveau')}</span></div>
+            <div class="t2">${esc(r.classe)}${r.filiere?' · '+esc(r.filiere):''} · ${esc(r.telephone)} · ${new Date(r.dateInscription).toLocaleDateString('fr-FR')}</div>
+            ${r.message ? `<div class="t2">💬 ${esc(r.message)}</div>` : ''}
+          </div>
+          <a class="btn btn-outline btn-sm" href="${waLink(r.telephone)}" target="_blank" rel="noopener">WhatsApp</a>
+          <select class="a-in" style="width:auto;margin-top:0" data-status="${r.id}">
+            <option value="nouveau" ${r.statut==='nouveau'?'selected':''}>Nouveau</option>
+            <option value="contacté" ${r.statut==='contacté'?'selected':''}>Contacté</option>
+            <option value="inscrit" ${r.statut==='inscrit'?'selected':''}>Inscrit</option>
+          </select>
+          <button class="btn btn-outline btn-sm" data-del="${r.id}">Supprimer</button>
+        </div>`).join('') : '<div class="empty-note">Aucune fiche reçue pour le moment.</div>'}
+    </div>`;
+  body.querySelectorAll('[data-status]').forEach(sel=>{
+    sel.onchange = async ()=>{ await updateDoc(doc(fbDB, C_INSC, sel.dataset.status), {statut: sel.value}); toast('✅ Statut mis à jour'); };
+  });
+  body.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = async ()=>{ if(!confirm('Supprimer cette fiche ?')) return;
+      await deleteDoc(doc(fbDB, C_INSC, b.dataset.del)); toast('🗑️ Supprimée'); renderAdminInscriptions(); };
+  });
+}
+</script>
+</body>
+</html>
