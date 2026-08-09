@@ -6,6 +6,12 @@
 <meta name="theme-color" content="#16213e">
 <meta name="description" content="Club Réussir Ensemble — Événements, galerie, vidéos et inscriptions.">
 <title>Club Réussir Ensemble</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CRE">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;0,900;1,600&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -245,6 +251,12 @@ if (params.get('admin') === '1') {
   bootSite();
 }
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+
 /* ══════════════════════════════ SITE PUBLIC ══════════════════════════════ */
 let siteTab = 'accueil';
 let events = [], gallery = [], videos = [];
@@ -269,20 +281,30 @@ function bootSite(){
   wireAdminTrigger();
 }
 
-let sealClicks = 0, sealClickTimer;
+let sealClicks = 0, sealClickTimer, sealLastTap = 0;
 function wireAdminTrigger(){
   const seal = document.querySelector('.topbar .brand-seal');
   if(!seal) return;
   seal.style.cursor = 'pointer';
-  seal.onclick = ()=>{
+  seal.style.touchAction = 'manipulation'; // évite le double-tap zoom qui "avale" les clics sur mobile
+
+  const trigger = (e)=>{
+    if(e) e.preventDefault(); // empêche le zoom / clic fantôme sur mobile
+    const now = Date.now();
+    // fenêtre glissante plus tolérante : chaque tap prolonge le délai de 2.5s
+    if(now - sealLastTap > 2500){ sealClicks = 0; }
+    sealLastTap = now;
     sealClicks++;
     clearTimeout(sealClickTimer);
-    sealClickTimer = setTimeout(()=>{ sealClicks = 0; }, 1500);
+    sealClickTimer = setTimeout(()=>{ sealClicks = 0; }, 2500);
     if(sealClicks >= 5){
       sealClicks = 0;
       location.href = location.pathname + '?admin=1';
     }
   };
+
+  seal.addEventListener('click', trigger);
+  seal.addEventListener('touchend', trigger, { passive:false });
 }
 
 function paintNav(){
