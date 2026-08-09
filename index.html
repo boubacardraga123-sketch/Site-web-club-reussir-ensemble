@@ -322,6 +322,22 @@ function waLink(tel){
   if(d.length===9) d = '224'+d;
   return `https://wa.me/${d}`;
 }
+function waWelcomeLink(tel, prenom){
+  const msg = `Bonjour ${prenom} 👋 Bienvenue au Club Réussir Ensemble !\n\nNous sommes ravis de t'accueillir parmi nous. Rigueur · Discipline · Travail — ensemble on va réussir 💪\n\nUn formateur reviendra vers toi très bientôt avec les prochaines étapes. À très vite !`;
+  return `${waLink(tel)}?text=${encodeURIComponent(msg)}`;
+}
+
+const DEFAULT_THEME = { ink:'#0F2F63', ink2:'#3E63A8', paper:'#FBFCFF', paper2:'#E8F1FC', red:'#FF5A3C', gold:'#2E7FE3' };
+function applyTheme(theme){
+  const t = { ...DEFAULT_THEME, ...(theme||{}) };
+  const root = document.documentElement.style;
+  root.setProperty('--ink', t.ink);
+  root.setProperty('--ink2', t.ink2);
+  root.setProperty('--paper', t.paper);
+  root.setProperty('--paper2', t.paper2);
+  root.setProperty('--red', t.red);
+  root.setProperty('--gold', t.gold);
+}
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -428,6 +444,9 @@ function paintNav(){
 }
 
 function listenAll(){
+  unsubs.push(onSnapshot(doc(fbDB, C_CONFIG, 'theme'), snap=>{
+    applyTheme(snap.exists() ? snap.data() : {});
+  }));
   unsubs.push(onSnapshot(doc(fbDB, C_CONFIG, 'apropos'), snap=>{
     siteConfig = snap.exists() ? snap.data() : {};
     if(siteTab==='accueil') renderSiteTab();
@@ -716,7 +735,7 @@ function renderAdminShell(){
   paintATabs(); renderAdminTab();
 }
 function paintATabs(){
-  const tabs = [['apropos','📝 Vision & valeurs'],['evenements','📅 Événements'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['inscriptions','📋 Inscriptions'],['avis','💬 Avis']];
+  const tabs = [['apropos','📝 Vision & valeurs'],['couleurs','🎨 Couleurs'],['evenements','📅 Événements'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['inscriptions','📋 Inscriptions'],['avis','💬 Avis']];
   document.getElementById('aTabs').innerHTML = tabs.map(([k,l])=>`<button class="${adminTab===k?'active':''}" data-t="${k}">${l}</button>`).join('');
   document.getElementById('aTabs').querySelectorAll('button').forEach(b=>{
     b.onclick = ()=>{ adminTab=b.dataset.t; paintATabs(); renderAdminTab(); };
@@ -727,6 +746,7 @@ async function renderAdminTab(){
   const body = document.getElementById('aBody');
   body.innerHTML = '<div class="spinner"></div>';
   if(adminTab==='apropos') return renderAdminApropos();
+  if(adminTab==='couleurs') return renderAdminCouleurs();
   if(adminTab==='evenements') return renderAdminEvenements();
   if(adminTab==='galerie') return renderAdminGalerie();
   if(adminTab==='videos') return renderAdminVideos();
@@ -759,6 +779,50 @@ async function renderAdminApropos(){
     try{ await setDoc(doc(fbDB, C_CONFIG, 'apropos'), payload); toast('✅ Enregistré — visible sur le site'); }
     catch(err){ toast('❌ '+err.message); }
   });
+}
+
+/* ── Admin: Couleurs de l'interface publique ── */
+async function renderAdminCouleurs(){
+  const body = document.getElementById('aBody');
+  const snap = await getDoc(doc(fbDB, C_CONFIG, 'theme'));
+  const t = { ...DEFAULT_THEME, ...(snap.exists() ? snap.data() : {}) };
+  const swatches = [
+    ['ink','Texte principal / fond du bandeau haut'],
+    ['ink2','Texte secondaire'],
+    ['paper','Fond des cartes'],
+    ['paper2','Fond général de la page'],
+    ['red','Accent principal (boutons, bandeau citations)'],
+    ['gold','Accent secondaire (liens, badges)']
+  ];
+  body.innerHTML = `
+    <div class="a-card">
+      <h3>🎨 Couleurs de l'interface publique</h3>
+      <p style="font-size:12px;color:var(--ink2);margin-top:-4px">Les changements s'appliquent en direct sur le site, pour tous les visiteurs.</p>
+      <form id="couleursForm">
+        ${swatches.map(([k,label])=>`
+          <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+            <input type="color" name="${k}" value="${t[k]}" style="width:46px;height:38px;border:1px solid var(--line);border-radius:8px;padding:2px;cursor:pointer">
+            <div><div style="font-size:13px;font-weight:600">${label}</div><div style="font-size:11px;color:var(--ink2);font-family:'Space Mono',monospace">${k}</div></div>
+          </div>`).join('')}
+        <div style="margin-top:18px;display:flex;gap:8px">
+          <button class="btn btn-ink btn-sm" type="submit">Enregistrer</button>
+          <button class="btn btn-outline btn-sm" type="button" id="resetTheme">Réinitialiser</button>
+        </div>
+      </form>
+    </div>`;
+  document.getElementById('couleursForm').addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const payload = {};
+    swatches.forEach(([k])=> payload[k] = fd.get(k));
+    try{ await setDoc(doc(fbDB, C_CONFIG, 'theme'), payload); toast('✅ Couleurs enregistrées'); }
+    catch(err){ toast('❌ '+err.message); }
+  });
+  document.getElementById('resetTheme').onclick = async ()=>{
+    if(!confirm('Revenir aux couleurs par défaut ?')) return;
+    try{ await setDoc(doc(fbDB, C_CONFIG, 'theme'), DEFAULT_THEME); toast('✅ Couleurs réinitialisées'); renderAdminCouleurs(); }
+    catch(err){ toast('❌ '+err.message); }
+  };
 }
 
 /* ── Admin: Événements ── */
@@ -889,6 +953,7 @@ async function renderAdminInscriptions(){
             ${r.message ? `<div class="t2">💬 ${esc(r.message)}</div>` : ''}
           </div>
           <a class="btn btn-outline btn-sm" href="${waLink(r.telephone)}" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn ${r.bienvenueEnvoyee?'btn-outline':'btn-red'} btn-sm" href="${waWelcomeLink(r.telephone, r.prenom)}" target="_blank" rel="noopener" data-bienvenue="${r.id}">${r.bienvenueEnvoyee?'✅ Bienvenue envoyée':'🎉 Envoyer bienvenue'}</a>
           <select class="a-in" style="width:auto;margin-top:0" data-status="${r.id}">
             <option value="nouveau" ${r.statut==='nouveau'?'selected':''}>Nouveau</option>
             <option value="contacté" ${r.statut==='contacté'?'selected':''}>Contacté</option>
@@ -899,6 +964,13 @@ async function renderAdminInscriptions(){
     </div>`;
   body.querySelectorAll('[data-status]').forEach(sel=>{
     sel.onchange = async ()=>{ await updateDoc(doc(fbDB, C_INSC, sel.dataset.status), {statut: sel.value}); toast('✅ Statut mis à jour'); };
+  });
+  body.querySelectorAll('[data-bienvenue]').forEach(a=>{
+    a.addEventListener('click', async ()=>{
+      await updateDoc(doc(fbDB, C_INSC, a.dataset.bienvenue), {bienvenueEnvoyee: true});
+      toast('✅ Marqué comme envoyé');
+      setTimeout(renderAdminInscriptions, 400);
+    });
   });
   body.querySelectorAll('[data-del]').forEach(b=>{
     b.onclick = async ()=>{ if(!confirm('Supprimer cette fiche ?')) return;
