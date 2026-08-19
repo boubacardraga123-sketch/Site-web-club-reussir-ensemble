@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#16213e">
+<script>
+(function(){
+  try{
+    var saved = localStorage.getItem('cre_theme');
+    var dark = saved ? saved==='dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  }catch(e){}
+})();
+</script>
 <meta name="description" content="Club Réussir Ensemble — Événements, galerie, vidéos et inscriptions. Club éducatif basé à Mamou, Guinée, sous la devise Rigueur · Discipline · Travail.">
 <title>Club Réussir Ensemble — Mamou, Guinée</title>
 <link rel="canonical" href="https://boubacardraga123-sketch.github.io/Site-web-club-reussir-ensemble/">
@@ -50,6 +59,7 @@
 :root{
   --ink:#0F2F63; --ink2:#3E63A8;
   --paper:#FBFCFF; --paper2:#E8F1FC;
+  --card:#fff;
   --red:#FF5A3C; --gold:#2E7FE3;
   --line: rgba(15,47,99,.15);
   --line-soft: rgba(15,47,99,.07);
@@ -58,6 +68,28 @@
   --font-mono: 'Space Mono', monospace;
   --radius: 8px;
 }
+[data-theme="dark"]{
+  --ink:#E9EEFC; --ink2:#9FB0DD;
+  --paper:#141B34; --paper2:#0A0F20;
+  --card:#1B2444;
+  --line: rgba(233,238,252,.14);
+  --line-soft: rgba(233,238,252,.07);
+}
+[data-theme="dark"] .topbar,
+[data-theme="dark"] .admin-top,
+[data-theme="dark"] .site-footer,
+[data-theme="dark"] .toast,
+[data-theme="dark"] .btn-ink,
+[data-theme="dark"] .admin-tabs button.active{
+  background:#0A0F20; color:#F2F5FF; border-color:#0A0F20;
+}
+[data-theme="dark"] .site-footer strong{ color:#fff; }
+[data-theme="dark"] .lightbox .cap,
+[data-theme="dark"] .lightbox .close{ color:#fff; border-color:#fff; }
+[data-theme="dark"] .fiche{ border-color: var(--ink); }
+[data-theme="dark"] img{ opacity:.92; }
+.theme-toggle{background:transparent;border:1.5px solid rgba(255,255,255,.35);color:inherit;border-radius:999px;width:36px;height:36px;flex-shrink:0;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;margin-left:auto}
+.theme-toggle:hover{border-color:rgba(255,255,255,.6)}
 *{box-sizing:border-box;margin:0;padding:0}
 
 /* ── BANDEAU DÉFILANT — citations de motivation ── */
@@ -144,18 +176,19 @@ a{color:inherit}
 
 /* ── EVENT CARDS ── */
 .evt-list{display:flex;flex-direction:column;gap:12px}
-.evt-card{display:flex;gap:14px;background:#fff;border:1px solid var(--line);border-radius:calc(var(--radius) - 2px);padding:14px;box-shadow:0 2px 8px rgba(22,33,62,.06)}
+.evt-card{display:flex;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:calc(var(--radius) - 2px);padding:14px;box-shadow:0 2px 8px rgba(22,33,62,.06)}
 .evt-card .txt{flex:1;min-width:0}
 .evt-card .txt h3{font-size:16px;font-weight:700;margin-bottom:4px}
 .evt-card .txt .meta{font-family:var(--font-mono);font-size:11px;color:var(--ink2);margin-bottom:6px}
 .evt-card .txt p{font-size:13px;color:var(--ink2);line-height:1.5}
 .evt-card .txt .lnk{margin-top:8px}
+.actu-thumb{width:72px;height:72px;object-fit:cover;border-radius:calc(var(--radius) - 2px);flex-shrink:0}
 .empty-note{text-align:center;color:var(--ink2);font-size:13.5px;padding:30px 10px;border:1.5px dashed var(--line);border-radius:var(--radius)}
 
 /* ── GALLERY ── */
 .gallery-grid{column-count:2;column-gap:14px}
 @media(min-width:640px){.gallery-grid{column-count:3}}
-.gallery-item{position:relative;break-inside:avoid;margin-bottom:16px;background:#fff;padding:7px 7px 12px;box-shadow:0 4px 12px rgba(22,33,62,.14);cursor:pointer}
+.gallery-item{position:relative;break-inside:avoid;margin-bottom:16px;background:var(--card);padding:7px 7px 12px;box-shadow:0 4px 12px rgba(22,33,62,.14);cursor:pointer}
 .gallery-item img{width:100%;display:block;background:var(--paper2)}
 .gallery-item .cap{font-size:11px;color:var(--ink2);margin-top:6px;padding:0 2px;font-family:var(--font-mono)}
 .gallery-item::before{content:'';position:absolute;top:-9px;left:50%;transform:translateX(-50%) rotate(-3deg);width:54px;height:20px;background:rgba(182,144,31,.32);border:1px solid rgba(182,144,31,.5)}
@@ -166,6 +199,8 @@ a{color:inherit}
 
 /* ── AVIS VISITEURS (fenêtre + bouton flottant) ── */
 .avis-fab{position:fixed;right:18px;bottom:18px;z-index:900;background:var(--red);color:#fff;border:none;border-radius:30px;padding:13px 18px;font-family:var(--font-body);font-weight:700;font-size:13px;box-shadow:0 6px 18px rgba(255,90,60,.4);cursor:pointer;display:flex;align-items:center;gap:8px}
+.wa-fab{position:fixed;left:18px;bottom:18px;z-index:900;background:#25D366;color:#fff;border:none;border-radius:50%;width:54px;height:54px;box-shadow:0 6px 18px rgba(37,211,102,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none}
+.wa-fab svg{width:28px;height:28px;fill:#fff}
 .avis-overlay{position:fixed;inset:0;background:rgba(15,47,99,.55);z-index:998;display:flex;align-items:flex-end;justify-content:center}
 @media(min-width:640px){.avis-overlay{align-items:center}}
 .avis-panel{background:var(--paper);width:100%;max-width:480px;max-height:82vh;border-radius:16px 16px 0 0;display:flex;flex-direction:column;overflow:hidden}
@@ -185,15 +220,34 @@ a{color:inherit}
 
 /* ── VIDEOS ── */
 .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
-.video-card{background:#fff;border:1px solid var(--line);border-radius:calc(var(--radius) - 2px);overflow:hidden;box-shadow:0 2px 8px rgba(22,33,62,.06)}
+.video-card{background:var(--card);border:1px solid var(--line);border-radius:calc(var(--radius) - 2px);overflow:hidden;box-shadow:0 2px 8px rgba(22,33,62,.06)}
 .video-card .frame{position:relative;aspect-ratio:16/9;background:#000}
+.hero-video{max-width:760px;margin:0 auto 30px;border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 28px rgba(22,33,62,.18)}
+.hero-video .frame{position:relative;aspect-ratio:16/9;background:#000}
+.hero-video .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.cal-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}
+.cal-item{flex:0 0 auto;min-width:150px;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px;cursor:pointer;box-shadow:0 2px 8px rgba(22,33,62,.06);transition:transform .12s}
+.cal-item:hover{transform:translateY(-2px)}
+.places-badge{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:4px 10px;border-radius:20px;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.02em}
+.places-badge.ok{background:#eaf3ff;color:var(--gold)}
+.places-badge.low{background:#fdecea;color:var(--red);animation:placesPulse 1.4s ease-in-out infinite}
+.places-badge.full{background:var(--line);color:var(--ink2)}
+@keyframes placesPulse{0%,100%{opacity:1}50%{opacity:.55}}
+.cal-item.soon{border-color:var(--red)}
+.cal-date{flex-shrink:0;width:46px;height:46px;border-radius:calc(var(--radius) - 2px);background:var(--paper2);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-mono)}
+.cal-item.soon .cal-date{background:var(--red);color:#fff}
+.cal-date .d{font-size:16px;font-weight:700;line-height:1.1}
+.cal-date .m{font-size:9px;text-transform:uppercase;letter-spacing:.06em}
+.cal-title{font-size:13px;font-weight:700;line-height:1.25}
+.cal-days{font-size:11px;color:var(--ink2);font-family:var(--font-mono);margin-top:2px}
+.cal-item.soon .cal-days{color:var(--red);font-weight:700}
 .video-card .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .video-card .info{padding:10px 12px}
 .video-card .info h3{font-size:13.5px;font-weight:700}
 .video-card .info p{font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.4}
 
 /* ── FICHE FORM ── */
-.fiche{background:#fff;border:3px double var(--ink);border-radius:4px;padding:22px 20px;max-width:520px;margin:0 auto;position:relative}
+.fiche{background:var(--card);border:3px double var(--ink);border-radius:4px;padding:22px 20px;max-width:520px;margin:0 auto;position:relative}
 .fiche .fiche-head{text-align:center;margin-bottom:18px}
 .fiche .fiche-head .tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
 .fiche .fiche-head h2{font-size:20px;margin-top:4px}
@@ -208,6 +262,7 @@ label.f-label{display:block;font-size:11.5px;font-weight:700;color:var(--ink2);m
 /* ── FOOTER ── */
 .site-footer{background:var(--ink);color:#9aa4c7;padding:22px 0;text-align:center;font-size:12px}
 .site-footer strong{color:var(--paper)}
+.map-embed{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 2px 8px rgba(22,33,62,.06)}
 
 /* ── ADMIN ── */
 .admin-shell{background:var(--paper2);min-height:100vh;padding-bottom:40px}
@@ -215,9 +270,9 @@ label.f-label{display:block;font-size:11.5px;font-weight:700;color:var(--ink2);m
 .admin-top .row{display:flex;align-items:center;gap:10px}
 .admin-top h1{color:var(--paper);font-size:16px;flex:1}
 .admin-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0}
-.admin-tabs button{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:8px 13px;font-weight:700;font-size:12px;cursor:pointer;color:var(--ink2);white-space:nowrap}
+.admin-tabs button{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:8px 13px;font-weight:700;font-size:12px;cursor:pointer;color:var(--ink2);white-space:nowrap}
 .admin-tabs button.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.a-card{background:#fff;border-radius:var(--radius);padding:16px;margin-bottom:14px;border:1px solid var(--line)}
+.a-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;border:1px solid var(--line)}
 .a-card h3{font-size:14.5px;margin-bottom:12px}
 .a-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
 .a-row:last-child{border-bottom:none}
@@ -300,6 +355,7 @@ const C_CONFIG = 'site_config';
 const C_AVIS  = 'site_avis';
 const C_TEMOIN = 'site_temoignages';
 const C_SESS  = 'site_sessions';
+const C_ACTUS = 'site_actus';
 
 /* ── Emblème du club : livre ouvert dessiné en SVG (aucune image externe) ── */
 const BRAND_ICON = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -309,6 +365,25 @@ const BRAND_ICON = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" 
 </svg>`;
 
 const app = document.getElementById('app');
+
+/* ── Mode sombre : appliqué immédiatement, mémorisé sur l'appareil ── */
+function initTheme(){
+  const saved = localStorage.getItem('cre_theme');
+  const preferDark = saved ? saved==='dark' : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', preferDark ? 'dark' : 'light');
+  const mc = document.querySelector('meta[name=theme-color]');
+  if(mc) mc.setAttribute('content', preferDark ? '#0A0F20' : '#16213e');
+}
+function toggleTheme(){
+  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
+  const next = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('cre_theme', next);
+  const mc = document.querySelector('meta[name=theme-color]');
+  if(mc) mc.setAttribute('content', next==='dark' ? '#0A0F20' : '#16213e');
+}
+initTheme();
+
 let toastTimeout;
 function toast(msg){
   const t = document.getElementById('toast');
@@ -476,7 +551,7 @@ if ('serviceWorker' in navigator) {
 
 /* ══════════════════════════════ SITE PUBLIC ══════════════════════════════ */
 let siteTab = 'accueil';
-let events = [], gallery = [], videos = [], temoignages = [], sessions = [];
+let events = [], gallery = [], videos = [], temoignages = [], sessions = [], actus = [];
 let siteConfig = {};
 let siteStats = {};
 let unsubs = [];
@@ -508,6 +583,7 @@ function bootSite(){
         <div class="n">Club Réussir Ensemble</div>
         <div class="m">Rigueur · Discipline · Travail</div>
       </div>
+      <button class="theme-toggle" id="themeToggle" title="Changer d'apparence" aria-label="Changer d'apparence"></button>
     </div>
     <div class="wrap"><div class="site-nav" id="siteNav"></div></div>
     </div>
@@ -518,12 +594,24 @@ function bootSite(){
         <a href="#" data-tab="confidentialite" style="color:#9aa4c7;font-size:12px;text-decoration:underline">Confidentialité</a>
       </div>
     </div>
-    <button class="avis-fab" id="avisFab">💬 Exprimez-vous</button>`;
+    <button class="avis-fab" id="avisFab">💬 Exprimez-vous</button>
+    <a class="wa-fab" id="waFab" href="${waLink(CONTACT_TEL)}" target="_blank" rel="noopener" aria-label="Contacter sur WhatsApp" title="Contacter sur WhatsApp">
+      <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2Zm0 18.13h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.11.82.83-3.03-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24Zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.17.24-.64.81-.78.97-.14.17-.29.19-.53.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.24-.86.84-.86 2.06s.88 2.4 1 2.56c.12.17 1.73 2.64 4.2 3.7.59.25 1.04.4 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.23-.17-.48-.29Z"/></svg>
+    </a>`;
   paintNav();
   listenAll();
   wireAdminTrigger();
   wireFooterLinks();
+  wireThemeToggle();
   document.getElementById('avisFab').onclick = openAvisPanel;
+}
+
+function wireThemeToggle(){
+  const btn = document.getElementById('themeToggle');
+  if(!btn) return;
+  const paint = ()=>{ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙'; };
+  paint();
+  btn.onclick = ()=>{ toggleTheme(); paint(); };
 }
 
 function wireFooterLinks(){
@@ -565,7 +653,7 @@ function wireAdminTrigger(){
 }
 
 function paintNav(){
-  const tabs = [['accueil','Accueil'],['evenements','Événements'],['galerie','Galerie'],['videos','Vidéos'],['temoignages','Témoignages'],['sessions','Sessions'],['inscription','Inscription']];
+  const tabs = [['accueil','Accueil'],['actus','Actualités'],['evenements','Événements'],['galerie','Galerie'],['videos','Vidéos'],['temoignages','Témoignages'],['sessions','Sessions'],['inscription','Inscription']];
   document.getElementById('siteNav').innerHTML = tabs.map(([k,l])=>
     `<button class="${siteTab===k?'active':''}" data-tab="${k}">${l}</button>`).join('');
   document.getElementById('siteNav').querySelectorAll('button').forEach(b=>{
@@ -605,12 +693,17 @@ function listenAll(){
     sessions = snap.docs.map(d=>({id:d.id,...d.data()}));
     if(siteTab==='accueil'||siteTab==='sessions'||siteTab==='inscription') renderSiteTab();
   }));
+  unsubs.push(onSnapshot(query(collection(fbDB, C_ACTUS), orderBy('createdAt','desc')), snap=>{
+    actus = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(siteTab==='accueil'||siteTab==='actus') renderSiteTab();
+  }));
 }
 
 function renderSiteTab(){
   const body = document.getElementById('siteBody');
   if(!body) return;
   if(siteTab==='accueil') body.innerHTML = tplAccueil();
+  else if(siteTab==='actus') body.innerHTML = tplActus();
   else if(siteTab==='evenements') body.innerHTML = tplEvenements();
   else if(siteTab==='galerie') body.innerHTML = tplGalerie();
   else if(siteTab==='videos') body.innerHTML = tplVideos();
@@ -626,6 +719,8 @@ const CONTACT_TEL = '625655839';
 const CONTACT_EMAIL = 'boubacardraga123@gmail.com';
 
 function tplContact(){
+  const adresse = (siteConfig.adresse||'').trim() || 'Mamou, Guinée';
+  const mapsQ = encodeURIComponent(adresse);
   return `
   <div class="sec-head"><div><div class="eyebrow">Nous joindre</div><h2>Contact</h2></div></div>
   <div class="fiche">
@@ -635,8 +730,13 @@ function tplContact(){
       <a class="btn btn-red" href="${waLink(CONTACT_TEL)}" target="_blank" rel="noopener">💬 Écrire sur WhatsApp — ${esc(CONTACT_TEL)}</a>
       <a class="btn btn-outline" href="mailto:${esc(CONTACT_EMAIL)}">✉️ ${esc(CONTACT_EMAIL)}</a>
     </div>
-    <p style="margin-top:20px;color:var(--ink2);font-size:13px">📍 Mamou, Guinée</p>
-  </div>`;
+    <p style="margin-top:20px;color:var(--ink2);font-size:13px">📍 ${esc(adresse)}</p>
+  </div>
+  <div class="sec-head" style="margin-top:28px"><div><div class="eyebrow">Nous trouver</div><h2>Où sommes-nous ?</h2></div></div>
+  <div class="map-embed">
+    <iframe src="https://www.google.com/maps?q=${mapsQ}&output=embed" width="100%" height="320" style="border:0;display:block" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Localisation du Club Réussir Ensemble"></iframe>
+  </div>
+  <a class="btn btn-outline" style="margin-top:12px" href="https://www.google.com/maps/search/?api=1&query=${mapsQ}" target="_blank" rel="noopener">🗺️ Ouvrir dans Google Maps</a>`;
 }
 
 function tplConfidentialite(){
@@ -658,6 +758,8 @@ function tplConfidentialite(){
 function tplAccueil(){
   const upcoming = events.slice(0,2);
   const hasApropos = (siteConfig.vision||'').trim() || (siteConfig.valeurs||'').trim();
+  const heroVidId = ytId((siteConfig.videoPresentation||'').trim());
+  const upcomingSessions = sessions.filter(s=>s.dateDebut && s.dateDebut >= Date.now()-86400000).slice(0,4);
   const statItems = [
     [siteStats.eleves_formes, 'élèves formés'],
     [siteStats.taux_reussite, 'de réussite'],
@@ -673,6 +775,15 @@ function tplAccueil(){
       <button class="btn btn-outline" data-tab="evenements">📅 Voir les événements</button>
     </div>
   </div>
+  ${heroVidId ? `
+  <div class="hero-video">
+    <div class="frame"><iframe src="https://www.youtube.com/embed/${esc(heroVidId)}" title="Vidéo de présentation — Club Réussir Ensemble" allowfullscreen loading="lazy"></iframe></div>
+  </div>` : ''}
+  ${upcomingSessions.length ? `
+  <div class="sec-head"><div><div class="eyebrow">Ne ratez pas la rentrée</div><h2>Prochaines sessions</h2></div>
+    <button class="btn btn-outline btn-sm" data-tab="sessions">Tout voir</button>
+  </div>
+  <div class="cal-strip">${upcomingSessions.map(sessCalItem).join('')}</div>` : ''}
   ${statItems.length ? `
   <div class="stats-block" style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:24px 0">
     ${statItems.map(([v,l])=>`<div class="stat-card" style="text-align:center;min-width:120px">
@@ -693,6 +804,11 @@ function tplAccueil(){
       <p class="apropos-txt">${esc(siteConfig.valeurs).replace(/\n/g,'<br>')}</p>
     </div>` : ''}
   </div>` : ''}
+  ${actus.length ? `
+  <div class="sec-head"><div><div class="eyebrow">Le club en bref</div><h2>Dernières actualités</h2></div>
+    <button class="btn btn-outline btn-sm" data-tab="actus">Tout voir</button>
+  </div>
+  <div class="evt-list">${actus.slice(0,3).map(actuCard).join('')}</div>` : ''}
   <div class="sec-head" style="margin-top:10px"><div><div class="eyebrow">À l'affiche</div><h2>Prochains événements</h2></div></div>
   ${upcoming.length ? `<div class="evt-list">${upcoming.map(evtCard).join('')}</div>` : `<div class="empty-note">Aucun événement publié pour le moment.</div>`}
   <div class="sec-head" style="margin-top:34px"><div><div class="eyebrow">En images</div><h2>Dernières photos</h2></div></div>
@@ -734,6 +850,23 @@ function tplGalerie(){
   ${gallery.length ? `<div class="gallery-grid">${gallery.map(galItem).join('')}</div>` : `<div class="empty-note">Aucune photo publiée pour le moment.</div>`}`;
 }
 
+function actuCard(a){
+  return `<div class="evt-card actu-card">
+    ${a.image ? `<img class="actu-thumb" src="${esc(a.image)}" alt="${esc(a.titre)}" loading="lazy">` : `<div class="stamp red"><div class="d">📰</div></div>`}
+    <div class="txt">
+      <div class="meta">${esc(fmtFull(a.createdAt))}</div>
+      <h3>${esc(a.titre)}</h3>
+      <p>${esc(a.texte)}</p>
+    </div>
+  </div>`;
+}
+
+function tplActus(){
+  return `
+  <div class="sec-head"><div><div class="eyebrow">Le club en bref</div><h2>Actualités</h2></div></div>
+  ${actus.length ? `<div class="evt-list">${actus.map(actuCard).join('')}</div>` : `<div class="empty-note">Aucune actualité publiée pour le moment.</div>`}`;
+}
+
 function vidCard(v){
   const id = v.youtubeId || ytId(v.url);
   return `<div class="video-card">
@@ -764,6 +897,17 @@ function tplTemoignages(){
   ${temoignages.length ? `<div class="evt-list">${temoignages.map(temoinCard).join('')}</div>` : `<div class="empty-note">Aucun témoignage publié pour le moment.</div>`}`;
 }
 
+function daysUntil(ts){
+  const ms = ts - Date.now();
+  return Math.ceil(ms / 86400000);
+}
+function placesBadge(s){
+  if(s.placesTotal==null || s.placesTotal==='') return '';
+  const restantes = (s.placesRestantes!=null && s.placesRestantes!=='') ? Number(s.placesRestantes) : Number(s.placesTotal);
+  if(restantes<=0) return `<div class="places-badge full">🚫 Complet — plus de places disponibles</div>`;
+  if(restantes<=5) return `<div class="places-badge low">🔥 Il reste ${restantes} place${restantes>1?'s':''} seulement !</div>`;
+  return `<div class="places-badge ok">🎟️ Il reste ${restantes} place${restantes>1?'s':''}</div>`;
+}
 function sessCard(s){
   const limite = s.dateLimite ? new Date(s.dateLimite) : null;
   const expiree = limite && limite.getTime() < Date.now();
@@ -773,6 +917,7 @@ function sessCard(s){
       <h3>${esc(s.titre)}</h3>
       <div class="meta">${s.dateDebut?'📅 Début : '+fmtFull(s.dateDebut):''}${s.dateLimite?" · ⏳ Date limite d'inscription : "+fmtFull(s.dateLimite):''}</div>
       <p>${esc(s.description||'')}</p>
+      ${!expiree ? placesBadge(s) : ''}
       ${expiree ? `<div class="meta" style="color:var(--red)">Inscriptions closes</div>` : ''}
     </div>
   </div>`;
@@ -782,6 +927,18 @@ function tplSessions(){
   return `
   <div class="sec-head"><div><div class="eyebrow">À venir</div><h2>Sessions d'inscription</h2></div></div>
   ${sessions.length ? `<div class="evt-list">${sessions.map(sessCard).join('')}</div>` : `<div class="empty-note">Aucune session annoncée pour le moment.</div>`}`;
+}
+
+function sessCalItem(s){
+  const j = daysUntil(s.dateDebut);
+  const soon = j<=7;
+  return `<div class="cal-item ${soon?'soon':''}" data-tab="sessions">
+    <div class="cal-date"><div class="d">${fmtDay(s.dateDebut)}</div><div class="m">${fmtMon(s.dateDebut)}</div></div>
+    <div class="cal-info">
+      <div class="cal-title">${esc(s.titre)}</div>
+      <div class="cal-days">${j===0?"Aujourd'hui" : j===1?'Demain' : j>1?`Dans ${j} jours`:'Déjà commencé'}</div>
+    </div>
+  </div>`;
 }
 
 function tplInscription(){
@@ -802,10 +959,13 @@ function tplInscription(){
 }
 
 function wireSiteBody(){
-  document.querySelectorAll('[data-tab]').forEach(el=>{
-    if(el.tagName==='BUTTON' && el.dataset.tab && el.closest('.hero')){
-      el.onclick = ()=>{ siteTab = el.dataset.tab; paintNav(); renderSiteTab(); };
+  document.querySelectorAll('#siteBody [data-tab]').forEach(el=>{
+    if(el.tagName==='BUTTON' && el.dataset.tab && !el.hasAttribute('onclick')){
+      el.onclick = ()=>{ siteTab = el.dataset.tab; paintNav(); renderSiteTab(); window.scrollTo(0,0); };
     }
+  });
+  document.querySelectorAll('.cal-item[data-tab]').forEach(el=>{
+    el.onclick = ()=>{ siteTab = el.dataset.tab; paintNav(); renderSiteTab(); window.scrollTo(0,0); };
   });
   document.querySelectorAll('.gallery-item').forEach(el=>{
     el.onclick = ()=> openLightbox(el.dataset.url, el.dataset.cap);
@@ -921,6 +1081,7 @@ function renderAdminShell(){
       <div class="admin-top"><div class="wrap row">
         <div class="brand-seal">CRE</div>
         <h1>Espace admin — Club Réussir Ensemble</h1>
+        <button class="theme-toggle" id="themeToggleAdmin" title="Changer d'apparence" aria-label="Changer d'apparence" style="margin-right:8px"></button>
         <a class="admin-link" href="${location.pathname}" target="_self">Voir le site</a>
       </div></div>
       <div class="wrap">
@@ -929,9 +1090,13 @@ function renderAdminShell(){
       </div>
     </div>`;
   paintATabs(); renderAdminTab();
+  const tt = document.getElementById('themeToggleAdmin');
+  const paintTT = ()=>{ tt.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙'; };
+  paintTT();
+  tt.onclick = ()=>{ toggleTheme(); paintTT(); };
 }
 function paintATabs(){
-  const tabs = [['apropos','📝 Vision & valeurs'],['stats','📊 Statistiques'],['couleurs','🎨 Design'],['evenements','📅 Événements'],['sessions','🗓️ Sessions'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['temoignages','💬 Témoignages'],['inscriptions','📋 Inscriptions'],['avis','💬 Avis']];
+  const tabs = [['apropos','📝 Vision & valeurs'],['stats','📊 Statistiques'],['couleurs','🎨 Design'],['actus','📰 Actualités'],['evenements','📅 Événements'],['sessions','🗓️ Sessions'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['temoignages','💬 Témoignages'],['inscriptions','📋 Inscriptions'],['avis','💬 Avis']];
   document.getElementById('aTabs').innerHTML = tabs.map(([k,l])=>`<button class="${adminTab===k?'active':''}" data-t="${k}">${l}</button>`).join('');
   document.getElementById('aTabs').querySelectorAll('button').forEach(b=>{
     b.onclick = ()=>{ adminTab=b.dataset.t; paintATabs(); renderAdminTab(); };
@@ -944,6 +1109,7 @@ async function renderAdminTab(){
   if(adminTab==='apropos') return renderAdminApropos();
   if(adminTab==='stats') return renderAdminStats();
   if(adminTab==='couleurs') return renderAdminCouleurs();
+  if(adminTab==='actus') return renderAdminActus();
   if(adminTab==='evenements') return renderAdminEvenements();
   if(adminTab==='sessions') return renderAdminSessions();
   if(adminTab==='galerie') return renderAdminGalerie();
@@ -968,13 +1134,17 @@ async function renderAdminApropos(){
         <textarea class="a-in" name="vision" rows="5" placeholder="Pourquoi le club existe, ce qu'il veut accomplir...">${esc(data.vision||'')}</textarea>
         <label class="a-label">Nos valeurs</label>
         <textarea class="a-in" name="valeurs" rows="5" placeholder="Rigueur, discipline, travail... et ce que ça veut dire concrètement">${esc(data.valeurs||'')}</textarea>
+        <label class="a-label">Adresse (utilisée pour la carte sur la page Contact)</label>
+        <input class="a-in" name="adresse" placeholder="ex : Siège du Club Réussir Ensemble, Mamou, Guinée" value="${esc(data.adresse||'')}">
+        <label class="a-label">Vidéo de présentation (lien YouTube, affichée en tête de page d'accueil)</label>
+        <input class="a-in" name="videoPresentation" placeholder="https://www.youtube.com/watch?v=..." value="${esc(data.videoPresentation||'')}">
         <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Enregistrer</button></div>
       </form>
     </div>`;
   document.getElementById('aproposForm').addEventListener('submit', async ev=>{
     ev.preventDefault();
     const fd = new FormData(ev.target);
-    const payload = { vision: fd.get('vision').trim(), valeurs: fd.get('valeurs').trim(), updatedAt: Date.now() };
+    const payload = { vision: fd.get('vision').trim(), valeurs: fd.get('valeurs').trim(), adresse: fd.get('adresse').trim(), videoPresentation: fd.get('videoPresentation').trim(), updatedAt: Date.now() };
     try{ await setDoc(doc(fbDB, C_CONFIG, 'apropos'), payload); toast('✅ Enregistré — visible sur le site'); }
     catch(err){ toast('❌ '+err.message); }
   });
@@ -1161,25 +1331,43 @@ async function renderAdminSessions(){
         <label class="a-label">Titre</label><input class="a-in" name="titre" required placeholder="ex : Session Rentrée 2026">
         <label class="a-label">Date de début</label><input class="a-in" type="date" name="dateDebut" required>
         <label class="a-label">Date limite d'inscription</label><input class="a-in" type="date" name="dateLimite">
-        <label class="a-label">Description</label><textarea class="a-in" name="description" rows="3" placeholder="Places disponibles, conditions..."></textarea>
+        <label class="a-label">Places disponibles (optionnel)</label><input class="a-in" type="number" name="placesTotal" min="0" placeholder="ex : 30 — laisser vide si illimité">
+        <label class="a-label">Description</label><textarea class="a-in" name="description" rows="3" placeholder="Conditions, informations complémentaires..."></textarea>
         <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Publier</button></div>
       </form>
     </div>
     <div class="a-card"><h3>Sessions publiées (${list.length})</h3>
       ${list.length ? list.map(s=>`
         <div class="a-row">
-          <div class="main"><div class="t1">${esc(s.titre)}</div><div class="t2">Début : ${fmtFull(s.dateDebut)}${s.dateLimite?' · Limite : '+fmtFull(s.dateLimite):''}</div></div>
+          <div class="main"><div class="t1">${esc(s.titre)}</div><div class="t2">Début : ${fmtFull(s.dateDebut)}${s.dateLimite?' · Limite : '+fmtFull(s.dateLimite):''}</div>
+            ${s.placesTotal!=null ? `<div class="t2" style="margin-top:6px;display:flex;align-items:center;gap:6px">Places restantes :
+              <input class="a-in" data-places="${s.id}" type="number" min="0" style="width:70px;padding:4px 8px" value="${s.placesRestantes!=null?s.placesRestantes:s.placesTotal}">
+              <span style="color:var(--ink2)">/ ${s.placesTotal}</span>
+              <button class="btn btn-outline btn-sm" data-saveplaces="${s.id}" type="button">💾</button>
+            </div>` : ''}
+          </div>
           <button class="btn btn-outline btn-sm" data-del="${s.id}">Supprimer</button>
         </div>`).join('') : '<div class="empty-note">Aucune session.</div>'}
     </div>`;
   document.getElementById('sessForm').addEventListener('submit', async ev=>{
     ev.preventDefault();
     const fd = new FormData(ev.target);
+    const placesTotal = fd.get('placesTotal')!=='' ? parseInt(fd.get('placesTotal'),10) : null;
     const data = { titre: fd.get('titre').trim(), dateDebut: new Date(fd.get('dateDebut')).getTime(),
       dateLimite: fd.get('dateLimite') ? new Date(fd.get('dateLimite')).getTime() : null,
+      placesTotal, placesRestantes: placesTotal,
       description: (fd.get('description')||'').trim(), createdAt: Date.now() };
     try{ await addDoc(collection(fbDB, C_SESS), data); toast('✅ Session publiée'); renderAdminSessions(); }
     catch(err){ toast('❌ '+err.message); }
+  });
+  body.querySelectorAll('[data-saveplaces]').forEach(b=>{
+    b.onclick = async ()=>{
+      const id = b.dataset.saveplaces;
+      const input = body.querySelector(`[data-places="${id}"]`);
+      const val = input.value==='' ? 0 : parseInt(input.value,10);
+      try{ await updateDoc(doc(fbDB, C_SESS, id), { placesRestantes: val }); toast('✅ Places mises à jour'); }
+      catch(err){ toast('❌ '+err.message); }
+    };
   });
   body.querySelectorAll('[data-del]').forEach(b=>{
     b.onclick = async ()=>{ if(!confirm('Supprimer cette session ?')) return;
@@ -1220,6 +1408,42 @@ async function renderAdminGalerie(){
   body.querySelectorAll('[data-del]').forEach(b=>{
     b.onclick = async ()=>{ if(!confirm('Supprimer cette photo ?')) return;
       await deleteDoc(doc(fbDB, C_GAL, b.dataset.del)); toast('🗑️ Supprimée'); renderAdminGalerie(); };
+  });
+}
+
+/* ── Admin: Actualités (blog court) ── */
+async function renderAdminActus(){
+  const body = document.getElementById('aBody');
+  const snap = await getDocs(query(collection(fbDB, C_ACTUS), orderBy('createdAt','desc')));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+  body.innerHTML = `
+    <div class="a-card">
+      <h3>➕ Nouvelle actualité</h3>
+      <p style="font-size:12px;color:var(--ink2);margin-top:-4px">Une actu courte (2-3 lignes) apparaît sur l'accueil et dans l'onglet Actualités.</p>
+      <form id="actuForm">
+        <label class="a-label">Titre</label><input class="a-in" name="titre" required maxlength="90">
+        <label class="a-label">Texte (court)</label><textarea class="a-in" name="texte" rows="3" required maxlength="400" placeholder="2 à 3 phrases suffisent..."></textarea>
+        <label class="a-label">Image — optionnel (lien URL)</label><input class="a-in" name="image" placeholder="https://...">
+        <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Publier</button></div>
+      </form>
+    </div>
+    <div class="a-card"><h3>Actualités publiées (${list.length})</h3>
+      ${list.length ? list.map(a=>`
+        <div class="a-row">
+          <div class="main"><div class="t1">${esc(a.titre)}</div><div class="t2">${esc(fmtFull(a.createdAt))} — ${esc((a.texte||'').slice(0,80))}${(a.texte||'').length>80?'…':''}</div></div>
+          <button class="btn btn-outline btn-sm" data-del="${a.id}">Supprimer</button>
+        </div>`).join('') : '<div class="empty-note">Aucune actualité publiée.</div>'}
+    </div>`;
+  document.getElementById('actuForm').addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const data = { titre: fd.get('titre').trim(), texte: fd.get('texte').trim(), image: (fd.get('image')||'').trim(), createdAt: Date.now() };
+    try{ await addDoc(collection(fbDB, C_ACTUS), data); toast('✅ Actualité publiée'); renderAdminActus(); }
+    catch(err){ toast('❌ '+err.message); }
+  });
+  body.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = async ()=>{ if(!confirm('Supprimer cette actualité ?')) return;
+      await deleteDoc(doc(fbDB, C_ACTUS, b.dataset.del)); toast('🗑️ Supprimée'); renderAdminActus(); };
   });
 }
 
