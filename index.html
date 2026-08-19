@@ -292,6 +292,8 @@ const C_VID   = 'site_videos';
 const C_INSC  = 'site_inscriptions';
 const C_CONFIG = 'site_config';
 const C_AVIS  = 'site_avis';
+const C_TEMOIN = 'site_temoignages';
+const C_SESS  = 'site_sessions';
 
 /* ── Emblème du club : livre ouvert dessiné en SVG (aucune image externe) ── */
 const BRAND_ICON = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -327,6 +329,34 @@ function waWelcomeLink(tel, prenom){
   return `${waLink(tel)}?text=${encodeURIComponent(msg)}`;
 }
 
+/* ── Décision d'admission (retenu / non retenu) : messages WhatsApp, Email, SMS ── */
+let msgTemplates = {
+  retenu: `Bonjour {prenom} 👋\n\nFélicitations ! Après étude de ta fiche d'inscription, tu es RETENU(E) au Club Réussir Ensemble 🎉\n\nRigueur · Discipline · Travail — bienvenue parmi nous ! Un formateur reviendra vers toi très bientôt avec les prochaines étapes.`,
+  non_retenu: `Bonjour {prenom},\n\nMerci pour ton intérêt pour le Club Réussir Ensemble. Après étude de ta fiche d'inscription, nous ne sommes malheureusement pas en mesure de te retenir pour cette session.\n\nNous t'encourageons vivement à retenter ta chance lors d'une prochaine ouverture. Merci de ta compréhension.`
+};
+async function loadMsgTemplates(){
+  try{
+    const snap = await getDoc(doc(fbDB, C_CONFIG, 'messages'));
+    if(snap.exists()){ const d = snap.data(); if(d.retenu) msgTemplates.retenu = d.retenu; if(d.non_retenu) msgTemplates.non_retenu = d.non_retenu; }
+  }catch(e){}
+}
+function decisionMsg(prenom, decision){
+  const tpl = decision==='retenu' ? msgTemplates.retenu : msgTemplates.non_retenu;
+  return tpl.replace(/\{prenom\}/g, prenom||'');
+}
+function decisionWaLink(tel, prenom, decision){
+  return `${waLink(tel)}?text=${encodeURIComponent(decisionMsg(prenom, decision))}`;
+}
+function decisionMailLink(email, prenom, decision){
+  const subject = decision==='retenu' ? 'Club Réussir Ensemble — Vous êtes retenu(e) !' : 'Club Réussir Ensemble — Votre candidature';
+  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(decisionMsg(prenom, decision))}`;
+}
+function decisionSmsLink(tel, prenom, decision){
+  let d = (tel||'').replace(/\D/g,'');
+  if(d.length===9) d = '224'+d;
+  return `sms:${d}?body=${encodeURIComponent(decisionMsg(prenom, decision))}`;
+}
+
 const DEFAULT_THEME = { ink:'#0F2F63', ink2:'#3E63A8', paper:'#FBFCFF', paper2:'#E8F1FC', red:'#FF5A3C', gold:'#2E7FE3' };
 function applyTheme(theme){
   const t = { ...DEFAULT_THEME, ...(theme||{}) };
@@ -347,8 +377,9 @@ if ('serviceWorker' in navigator) {
 
 /* ══════════════════════════════ SITE PUBLIC ══════════════════════════════ */
 let siteTab = 'accueil';
-let events = [], gallery = [], videos = [];
+let events = [], gallery = [], videos = [], temoignages = [], sessions = [];
 let siteConfig = {};
+let siteStats = {};
 let unsubs = [];
 
 const MOTIVATION_QUOTES = [
@@ -435,7 +466,7 @@ function wireAdminTrigger(){
 }
 
 function paintNav(){
-  const tabs = [['accueil','Accueil'],['evenements','Événements'],['galerie','Galerie'],['videos','Vidéos'],['inscription','Inscription']];
+  const tabs = [['accueil','Accueil'],['evenements','Événements'],['galerie','Galerie'],['videos','Vidéos'],['temoignages','Témoignages'],['sessions','Sessions'],['inscription','Inscription']];
   document.getElementById('siteNav').innerHTML = tabs.map(([k,l])=>
     `<button class="${siteTab===k?'active':''}" data-tab="${k}">${l}</button>`).join('');
   document.getElementById('siteNav').querySelectorAll('button').forEach(b=>{
@@ -451,6 +482,10 @@ function listenAll(){
     siteConfig = snap.exists() ? snap.data() : {};
     if(siteTab==='accueil') renderSiteTab();
   }));
+  unsubs.push(onSnapshot(doc(fbDB, C_CONFIG, 'stats'), snap=>{
+    siteStats = snap.exists() ? snap.data() : {};
+    if(siteTab==='accueil') renderSiteTab();
+  }));
   unsubs.push(onSnapshot(query(collection(fbDB, C_EVT), orderBy('date','desc')), snap=>{
     events = snap.docs.map(d=>({id:d.id,...d.data()}));
     if(siteTab==='accueil'||siteTab==='evenements') renderSiteTab();
@@ -463,6 +498,14 @@ function listenAll(){
     videos = snap.docs.map(d=>({id:d.id,...d.data()}));
     if(siteTab==='accueil'||siteTab==='videos') renderSiteTab();
   }));
+  unsubs.push(onSnapshot(query(collection(fbDB, C_TEMOIN), orderBy('createdAt','desc')), snap=>{
+    temoignages = snap.docs.map(d=>({id:d.id,...d.data()})).filter(t=>t.visible!==false);
+    if(siteTab==='accueil'||siteTab==='temoignages') renderSiteTab();
+  }));
+  unsubs.push(onSnapshot(query(collection(fbDB, C_SESS), orderBy('dateDebut','asc')), snap=>{
+    sessions = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(siteTab==='accueil'||siteTab==='sessions'||siteTab==='inscription') renderSiteTab();
+  }));
 }
 
 function renderSiteTab(){
@@ -472,6 +515,8 @@ function renderSiteTab(){
   else if(siteTab==='evenements') body.innerHTML = tplEvenements();
   else if(siteTab==='galerie') body.innerHTML = tplGalerie();
   else if(siteTab==='videos') body.innerHTML = tplVideos();
+  else if(siteTab==='temoignages') body.innerHTML = tplTemoignages();
+  else if(siteTab==='sessions') body.innerHTML = tplSessions();
   else if(siteTab==='inscription') body.innerHTML = tplInscription();
   else if(siteTab==='contact') body.innerHTML = tplContact();
   else if(siteTab==='confidentialite') body.innerHTML = tplConfidentialite();
@@ -514,6 +559,11 @@ function tplConfidentialite(){
 function tplAccueil(){
   const upcoming = events.slice(0,2);
   const hasApropos = (siteConfig.vision||'').trim() || (siteConfig.valeurs||'').trim();
+  const statItems = [
+    [siteStats.eleves_formes, 'élèves formés'],
+    [siteStats.taux_reussite, 'de réussite'],
+    [siteStats.annees_experience, 'ans d\'expérience']
+  ].filter(([v])=> (v||'').toString().trim());
   return `
   <div class="hero">
     <div class="motto-stamp">Rigueur · Discipline · Travail</div>
@@ -524,6 +574,13 @@ function tplAccueil(){
       <button class="btn btn-outline" data-tab="evenements">📅 Voir les événements</button>
     </div>
   </div>
+  ${statItems.length ? `
+  <div class="stats-block" style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:24px 0">
+    ${statItems.map(([v,l])=>`<div class="stat-card" style="text-align:center;min-width:120px">
+      <div style="font-size:28px;font-weight:800;color:var(--red)">${esc(v)}</div>
+      <div class="t2">${esc(l)}</div>
+    </div>`).join('')}
+  </div>` : ''}
   ${hasApropos ? `
   <div class="apropos-block">
     ${(siteConfig.vision||'').trim() ? `
@@ -540,7 +597,10 @@ function tplAccueil(){
   <div class="sec-head" style="margin-top:10px"><div><div class="eyebrow">À l'affiche</div><h2>Prochains événements</h2></div></div>
   ${upcoming.length ? `<div class="evt-list">${upcoming.map(evtCard).join('')}</div>` : `<div class="empty-note">Aucun événement publié pour le moment.</div>`}
   <div class="sec-head" style="margin-top:34px"><div><div class="eyebrow">En images</div><h2>Dernières photos</h2></div></div>
-  ${gallery.length ? `<div class="gallery-grid">${gallery.slice(0,6).map(galItem).join('')}</div>` : `<div class="empty-note">Galerie bientôt en ligne.</div>`}`;
+  ${gallery.length ? `<div class="gallery-grid">${gallery.slice(0,6).map(galItem).join('')}</div>` : `<div class="empty-note">Galerie bientôt en ligne.</div>`}
+  ${temoignages.length ? `
+  <div class="sec-head" style="margin-top:34px"><div><div class="eyebrow">Ils en parlent</div><h2>Témoignages d'anciens</h2></div></div>
+  <div class="evt-list">${temoignages.slice(0,2).map(temoinCard).join('')}</div>` : ''}`;
 }
 
 function evtCard(e){
@@ -589,6 +649,42 @@ function tplVideos(){
   ${videos.length ? `<div class="video-grid">${videos.map(vidCard).join('')}</div>` : `<div class="empty-note">Aucune vidéo publiée pour le moment.</div>`}`;
 }
 
+function temoinCard(t){
+  return `<div class="evt-card">
+    <div class="stamp ink"><div class="d">💬</div></div>
+    <div class="txt">
+      <h3>${esc(t.nom)}${t.promo?` <span style="font-weight:400;color:var(--ink2);font-size:14px">— ${esc(t.promo)}</span>`:''}</h3>
+      <p style="font-style:italic">« ${esc(t.texte)} »</p>
+    </div>
+  </div>`;
+}
+
+function tplTemoignages(){
+  return `
+  <div class="sec-head"><div><div class="eyebrow">Ils en parlent</div><h2>Témoignages d'anciens</h2></div></div>
+  ${temoignages.length ? `<div class="evt-list">${temoignages.map(temoinCard).join('')}</div>` : `<div class="empty-note">Aucun témoignage publié pour le moment.</div>`}`;
+}
+
+function sessCard(s){
+  const limite = s.dateLimite ? new Date(s.dateLimite) : null;
+  const expiree = limite && limite.getTime() < Date.now();
+  return `<div class="evt-card">
+    <div class="stamp ${expiree?'ink':'red'}"><div class="d">${s.dateDebut?fmtDay(s.dateDebut):'—'}</div><div class="m">${s.dateDebut?fmtMon(s.dateDebut):''}</div></div>
+    <div class="txt">
+      <h3>${esc(s.titre)}</h3>
+      <div class="meta">${s.dateDebut?'📅 Début : '+fmtFull(s.dateDebut):''}${s.dateLimite?" · ⏳ Date limite d'inscription : "+fmtFull(s.dateLimite):''}</div>
+      <p>${esc(s.description||'')}</p>
+      ${expiree ? `<div class="meta" style="color:var(--red)">Inscriptions closes</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function tplSessions(){
+  return `
+  <div class="sec-head"><div><div class="eyebrow">À venir</div><h2>Sessions d'inscription</h2></div></div>
+  ${sessions.length ? `<div class="evt-list">${sessions.map(sessCard).join('')}</div>` : `<div class="empty-note">Aucune session annoncée pour le moment.</div>`}`;
+}
+
 function tplInscription(){
   return `
   <div class="fiche">
@@ -597,6 +693,7 @@ function tplInscription(){
       <label class="f-label">Nom</label><input type="text" name="nom" required>
       <label class="f-label">Prénom</label><input type="text" name="prenom" required>
       <label class="f-label">Téléphone (WhatsApp)</label><input type="tel" name="telephone" required placeholder="622 00 00 00">
+      <label class="f-label">Email (optionnel)</label><input type="email" name="email" placeholder="exemple@mail.com">
       <label class="f-label">Classe</label><input type="text" name="classe" required placeholder="ex : 10e Année">
       <label class="f-label">Filière (si applicable)</label><input type="text" name="filiere" placeholder="SM, SS, ...">
       <label class="f-label">Message (optionnel)</label><textarea name="message" placeholder="Une question, une remarque ?"></textarea>
@@ -621,9 +718,9 @@ function wireSiteBody(){
       const fd = new FormData(form);
       const data = {
         nom: fd.get('nom').trim(), prenom: fd.get('prenom').trim(),
-        telephone: fd.get('telephone').trim(), classe: fd.get('classe').trim(),
+        telephone: fd.get('telephone').trim(), email: (fd.get('email')||'').trim(), classe: fd.get('classe').trim(),
         filiere: (fd.get('filiere')||'').trim(), message: (fd.get('message')||'').trim(),
-        statut: 'nouveau', dateInscription: Date.now()
+        statut: 'nouveau', decision: 'en_attente', dateInscription: Date.now()
       };
       const btn = form.querySelector('button[type=submit]');
       btn.disabled = true; btn.textContent = 'Envoi...';
@@ -700,7 +797,7 @@ function openAvisPanel(){
 /* ══════════════════════════════ ESPACE ADMIN ══════════════════════════════ */
 function bootAdmin(){
   const saved = sessionStorage.getItem('creAdminOK');
-  if(saved === '1'){ renderAdminShell(); return; }
+  if(saved === '1'){ loadMsgTemplates(); renderAdminShell(); return; }
   app.innerHTML = `
     <div class="center-box">
       <div class="stamp ink"><div class="d">🔒</div></div>
@@ -711,7 +808,7 @@ function bootAdmin(){
     </div>`;
   const go = ()=>{
     const v = document.getElementById('codeIn').value.trim();
-    if(v === ADMIN_CODE){ sessionStorage.setItem('creAdminOK','1'); renderAdminShell(); }
+    if(v === ADMIN_CODE){ sessionStorage.setItem('creAdminOK','1'); loadMsgTemplates(); renderAdminShell(); }
     else toast('❌ Code incorrect');
   };
   document.getElementById('codeBtn').onclick = go;
@@ -735,7 +832,7 @@ function renderAdminShell(){
   paintATabs(); renderAdminTab();
 }
 function paintATabs(){
-  const tabs = [['apropos','📝 Vision & valeurs'],['couleurs','🎨 Couleurs'],['evenements','📅 Événements'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['inscriptions','📋 Inscriptions'],['avis','💬 Avis']];
+  const tabs = [['apropos','📝 Vision & valeurs'],['stats','📊 Statistiques'],['couleurs','🎨 Couleurs'],['evenements','📅 Événements'],['sessions','🗓️ Sessions'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['temoignages','💬 Témoignages'],['inscriptions','📋 Inscriptions'],['avis','💬 Avis']];
   document.getElementById('aTabs').innerHTML = tabs.map(([k,l])=>`<button class="${adminTab===k?'active':''}" data-t="${k}">${l}</button>`).join('');
   document.getElementById('aTabs').querySelectorAll('button').forEach(b=>{
     b.onclick = ()=>{ adminTab=b.dataset.t; paintATabs(); renderAdminTab(); };
@@ -746,10 +843,13 @@ async function renderAdminTab(){
   const body = document.getElementById('aBody');
   body.innerHTML = '<div class="spinner"></div>';
   if(adminTab==='apropos') return renderAdminApropos();
+  if(adminTab==='stats') return renderAdminStats();
   if(adminTab==='couleurs') return renderAdminCouleurs();
   if(adminTab==='evenements') return renderAdminEvenements();
+  if(adminTab==='sessions') return renderAdminSessions();
   if(adminTab==='galerie') return renderAdminGalerie();
   if(adminTab==='videos') return renderAdminVideos();
+  if(adminTab==='temoignages') return renderAdminTemoignages();
   if(adminTab==='inscriptions') return renderAdminInscriptions();
   if(adminTab==='avis') return renderAdminAvis();
   if(adminTab==='avis') return renderAdminAvis();
@@ -777,6 +877,32 @@ async function renderAdminApropos(){
     const fd = new FormData(ev.target);
     const payload = { vision: fd.get('vision').trim(), valeurs: fd.get('valeurs').trim(), updatedAt: Date.now() };
     try{ await setDoc(doc(fbDB, C_CONFIG, 'apropos'), payload); toast('✅ Enregistré — visible sur le site'); }
+    catch(err){ toast('❌ '+err.message); }
+  });
+}
+
+/* ── Admin: Statistiques publiques ── */
+async function renderAdminStats(){
+  const body = document.getElementById('aBody');
+  const snap = await getDoc(doc(fbDB, C_CONFIG, 'stats'));
+  const data = snap.exists() ? snap.data() : {};
+  body.innerHTML = `
+    <div class="a-card">
+      <h3>📊 Statistiques publiques</h3>
+      <p style="font-size:12px;color:var(--ink2);margin-top:-4px">Affichées en chiffres-clés sur la page d'accueil. Laissez un champ vide pour ne pas l'afficher.</p>
+      <form id="statsForm">
+        <label class="a-label">Élèves formés</label><input class="a-in" name="eleves_formes" placeholder="ex : 250+" value="${esc(data.eleves_formes||'')}">
+        <label class="a-label">Taux de réussite</label><input class="a-in" name="taux_reussite" placeholder="ex : 92%" value="${esc(data.taux_reussite||'')}">
+        <label class="a-label">Années d'expérience</label><input class="a-in" name="annees_experience" placeholder="ex : 5" value="${esc(data.annees_experience||'')}">
+        <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Enregistrer</button></div>
+      </form>
+    </div>`;
+  document.getElementById('statsForm').addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const payload = { eleves_formes: fd.get('eleves_formes').trim(), taux_reussite: fd.get('taux_reussite').trim(),
+      annees_experience: fd.get('annees_experience').trim(), updatedAt: Date.now() };
+    try{ await setDoc(doc(fbDB, C_CONFIG, 'stats'), payload); toast('✅ Statistiques enregistrées'); }
     catch(err){ toast('❌ '+err.message); }
   });
 }
@@ -864,6 +990,44 @@ async function renderAdminEvenements(){
   });
 }
 
+/* ── Admin: Sessions d'inscription ── */
+async function renderAdminSessions(){
+  const body = document.getElementById('aBody');
+  const snap = await getDocs(query(collection(fbDB, C_SESS), orderBy('dateDebut','asc')));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+  body.innerHTML = `
+    <div class="a-card">
+      <h3>➕ Nouvelle session d'inscription</h3>
+      <form id="sessForm">
+        <label class="a-label">Titre</label><input class="a-in" name="titre" required placeholder="ex : Session Rentrée 2026">
+        <label class="a-label">Date de début</label><input class="a-in" type="date" name="dateDebut" required>
+        <label class="a-label">Date limite d'inscription</label><input class="a-in" type="date" name="dateLimite">
+        <label class="a-label">Description</label><textarea class="a-in" name="description" rows="3" placeholder="Places disponibles, conditions..."></textarea>
+        <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Publier</button></div>
+      </form>
+    </div>
+    <div class="a-card"><h3>Sessions publiées (${list.length})</h3>
+      ${list.length ? list.map(s=>`
+        <div class="a-row">
+          <div class="main"><div class="t1">${esc(s.titre)}</div><div class="t2">Début : ${fmtFull(s.dateDebut)}${s.dateLimite?' · Limite : '+fmtFull(s.dateLimite):''}</div></div>
+          <button class="btn btn-outline btn-sm" data-del="${s.id}">Supprimer</button>
+        </div>`).join('') : '<div class="empty-note">Aucune session.</div>'}
+    </div>`;
+  document.getElementById('sessForm').addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const data = { titre: fd.get('titre').trim(), dateDebut: new Date(fd.get('dateDebut')).getTime(),
+      dateLimite: fd.get('dateLimite') ? new Date(fd.get('dateLimite')).getTime() : null,
+      description: (fd.get('description')||'').trim(), createdAt: Date.now() };
+    try{ await addDoc(collection(fbDB, C_SESS), data); toast('✅ Session publiée'); renderAdminSessions(); }
+    catch(err){ toast('❌ '+err.message); }
+  });
+  body.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = async ()=>{ if(!confirm('Supprimer cette session ?')) return;
+      await deleteDoc(doc(fbDB, C_SESS, b.dataset.del)); toast('🗑️ Supprimée'); renderAdminSessions(); };
+  });
+}
+
 /* ── Admin: Galerie ── */
 async function renderAdminGalerie(){
   const body = document.getElementById('aBody');
@@ -897,6 +1061,49 @@ async function renderAdminGalerie(){
   body.querySelectorAll('[data-del]').forEach(b=>{
     b.onclick = async ()=>{ if(!confirm('Supprimer cette photo ?')) return;
       await deleteDoc(doc(fbDB, C_GAL, b.dataset.del)); toast('🗑️ Supprimée'); renderAdminGalerie(); };
+  });
+}
+
+/* ── Admin: Témoignages d'anciens ── */
+async function renderAdminTemoignages(){
+  const body = document.getElementById('aBody');
+  const snap = await getDocs(query(collection(fbDB, C_TEMOIN), orderBy('createdAt','desc')));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+  body.innerHTML = `
+    <div class="a-card">
+      <h3>➕ Ajouter un témoignage</h3>
+      <form id="temoinForm">
+        <label class="a-label">Nom de l'ancien élève</label><input class="a-in" name="nom" required>
+        <label class="a-label">Promo / année — optionnel</label><input class="a-in" name="promo" placeholder="ex : Promo 2024">
+        <label class="a-label">Témoignage</label><textarea class="a-in" name="texte" rows="3" required placeholder="Ce que l'élève dit du club..."></textarea>
+        <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Publier</button></div>
+      </form>
+    </div>
+    <div class="a-card"><h3>Témoignages publiés (${list.length})</h3>
+      ${list.length ? list.map(t=>`
+        <div class="a-row">
+          <div class="main"><div class="t1">${esc(t.nom)}${t.promo?' · '+esc(t.promo):''}</div><div class="t2">« ${esc(t.texte)} »</div></div>
+          <button class="btn ${t.visible===false?'btn-red':'btn-outline'} btn-sm" data-toggle="${t.id}">${t.visible===false?'Masqué':'Visible'}</button>
+          <button class="btn btn-outline btn-sm" data-del="${t.id}">Supprimer</button>
+        </div>`).join('') : '<div class="empty-note">Aucun témoignage.</div>'}
+    </div>`;
+  document.getElementById('temoinForm').addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const data = { nom: fd.get('nom').trim(), promo: (fd.get('promo')||'').trim(), texte: fd.get('texte').trim(), visible: true, createdAt: Date.now() };
+    try{ await addDoc(collection(fbDB, C_TEMOIN), data); toast('✅ Témoignage publié'); renderAdminTemoignages(); }
+    catch(err){ toast('❌ '+err.message); }
+  });
+  body.querySelectorAll('[data-toggle]').forEach(b=>{
+    b.onclick = async ()=>{
+      const cur = list.find(t=>t.id===b.dataset.toggle);
+      await updateDoc(doc(fbDB, C_TEMOIN, b.dataset.toggle), {visible: cur.visible===false ? true : false});
+      renderAdminTemoignages();
+    };
+  });
+  body.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = async ()=>{ if(!confirm('Supprimer ce témoignage ?')) return;
+      await deleteDoc(doc(fbDB, C_TEMOIN, b.dataset.del)); toast('🗑️ Supprimé'); renderAdminTemoignages(); };
   });
 }
 
@@ -938,19 +1145,50 @@ async function renderAdminVideos(){
 }
 
 /* ── Admin: Inscriptions ── */
+let inscSelected = new Set();
 async function renderAdminInscriptions(){
   const body = document.getElementById('aBody');
   const snap = await getDocs(query(collection(fbDB, C_INSC), orderBy('dateInscription','desc')));
   const list = snap.docs.map(d=>({id:d.id,...d.data()}));
   const chipClass = s => s==='inscrit' ? 'chip-done' : s==='contacté' ? 'chip-contact' : 'chip-new';
+  const decChipClass = d => d==='retenu' ? 'chip-done' : d==='non_retenu' ? 'chip-contact' : 'chip-new';
+  const decLabel = d => d==='retenu' ? '✅ Retenu' : d==='non_retenu' ? '❌ Non retenu' : '⏳ En attente';
+  const joursAttente = ts => Math.floor((Date.now()-ts)/86400000);
+  const RAPPEL_SEUIL = 3; // jours avant alerte
+
   body.innerHTML = `
+    <div class="a-card">
+      <h3>✉️ Modèles de message (décision d'admission)</h3>
+      <p class="t2" style="margin-bottom:10px">Utilisez <code>{prenom}</code> pour insérer le prénom automatiquement.</p>
+      <label class="f-label">Message si retenu(e)</label>
+      <textarea class="a-in" rows="4" id="tplRetenu">${esc(msgTemplates.retenu)}</textarea>
+      <label class="f-label">Message si non retenu(e)</label>
+      <textarea class="a-in" rows="4" id="tplNonRetenu">${esc(msgTemplates.non_retenu)}</textarea>
+      <div style="margin-top:10px"><button class="btn btn-ink btn-sm" id="tplSave">💾 Enregistrer les modèles</button></div>
+    </div>
+    <div class="a-card" id="bulkBar" style="${inscSelected.size?'':'display:none'}">
+      <h3>📤 Envoi groupé (${inscSelected.size} sélectionné${inscSelected.size>1?'s':''})</h3>
+      <p class="t2" style="margin-bottom:10px">Ouvre les liens de notification un par un pour chaque élève sélectionné, selon sa décision actuelle.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" id="bulkWa">📲 Ouvrir tout en WhatsApp</button>
+        <button class="btn btn-outline btn-sm" id="bulkEmail">✉️ Ouvrir tout en Email</button>
+        <button class="btn btn-outline btn-sm" id="bulkSms">💬 Ouvrir tout en SMS</button>
+        <button class="btn btn-outline btn-sm" id="bulkClear">Vider la sélection</button>
+      </div>
+    </div>
     <div class="a-card"><h3>Fiches reçues (${list.length})</h3>
-      ${list.length ? list.map(r=>`
-        <div class="a-row">
+      ${list.length ? list.map(r=>{
+        const jrs = joursAttente(r.dateInscription);
+        const enAttenteDecision = !r.decision || r.decision==='en_attente';
+        const alerte = enAttenteDecision && jrs>=RAPPEL_SEUIL;
+        return `
+        <div class="a-row" style="${alerte?'border-left:3px solid var(--red);padding-left:8px':''}">
+          <input type="checkbox" data-select="${r.id}" ${inscSelected.has(r.id)?'checked':''} style="margin-top:4px">
           <div class="main">
-            <div class="t1">${esc(r.nom)} ${esc(r.prenom)} <span class="chip ${chipClass(r.statut)}">${esc(r.statut||'nouveau')}</span></div>
-            <div class="t2">${esc(r.classe)}${r.filiere?' · '+esc(r.filiere):''} · ${esc(r.telephone)} · ${new Date(r.dateInscription).toLocaleDateString('fr-FR')}</div>
+            <div class="t1">${esc(r.nom)} ${esc(r.prenom)} <span class="chip ${chipClass(r.statut)}">${esc(r.statut||'nouveau')}</span> <span class="chip ${decChipClass(r.decision)}">${decLabel(r.decision)}</span></div>
+            <div class="t2">${esc(r.classe)}${r.filiere?' · '+esc(r.filiere):''} · ${esc(r.telephone)}${r.email?' · '+esc(r.email):''} · ${new Date(r.dateInscription).toLocaleDateString('fr-FR')}</div>
             ${r.message ? `<div class="t2">💬 ${esc(r.message)}</div>` : ''}
+            ${alerte ? `<div class="t2" style="color:var(--red)">⏰ En attente de décision depuis ${jrs} jour${jrs>1?'s':''}</div>` : ''}
           </div>
           <a class="btn btn-outline btn-sm" href="${waLink(r.telephone)}" target="_blank" rel="noopener">WhatsApp</a>
           <a class="btn ${r.bienvenueEnvoyee?'btn-outline':'btn-red'} btn-sm" href="${waWelcomeLink(r.telephone, r.prenom)}" target="_blank" rel="noopener" data-bienvenue="${r.id}">${r.bienvenueEnvoyee?'✅ Bienvenue envoyée':'🎉 Envoyer bienvenue'}</a>
@@ -960,10 +1198,71 @@ async function renderAdminInscriptions(){
             <option value="inscrit" ${r.statut==='inscrit'?'selected':''}>Inscrit</option>
           </select>
           <button class="btn btn-outline btn-sm" data-del="${r.id}">Supprimer</button>
-        </div>`).join('') : '<div class="empty-note">Aucune fiche reçue pour le moment.</div>'}
+        </div>
+        <div class="a-row" style="flex-wrap:wrap;align-items:center;gap:8px">
+          <select class="a-in" style="width:auto;margin-top:0" data-decision="${r.id}">
+            <option value="en_attente" ${enAttenteDecision?'selected':''}>⏳ Décision : en attente</option>
+            <option value="retenu" ${r.decision==='retenu'?'selected':''}>✅ Retenu(e) pour le club</option>
+            <option value="non_retenu" ${r.decision==='non_retenu'?'selected':''}>❌ Non retenu(e)</option>
+          </select>
+          <a class="btn btn-outline btn-sm" href="${decisionWaLink(r.telephone, r.prenom, r.decision==='non_retenu'?'non_retenu':'retenu')}" target="_blank" rel="noopener" data-decision-send="${r.id}" data-channel="wa">📲 Notifier WhatsApp</a>
+          ${r.email ? `<a class="btn btn-outline btn-sm" href="${decisionMailLink(r.email, r.prenom, r.decision==='non_retenu'?'non_retenu':'retenu')}" data-decision-send="${r.id}" data-channel="email">✉️ Notifier Email</a>` : `<span class="t2" style="opacity:.6">✉️ Pas d'email fourni</span>`}
+          <a class="btn btn-outline btn-sm" href="${decisionSmsLink(r.telephone, r.prenom, r.decision==='non_retenu'?'non_retenu':'retenu')}" data-decision-send="${r.id}" data-channel="sms">💬 Notifier SMS</a>
+          ${r.decisionNotifiee ? `<span class="t2" style="color:var(--ok,#1a8f4c)">✅ Notification envoyée${r.decisionCanal?' ('+esc(r.decisionCanal)+')':''}</span>` : ''}
+        </div>`;
+      }).join('') : '<div class="empty-note">Aucune fiche reçue pour le moment.</div>'}
     </div>`;
+
+  document.getElementById('tplSave').onclick = async ()=>{
+    const retenu = document.getElementById('tplRetenu').value.trim();
+    const non_retenu = document.getElementById('tplNonRetenu').value.trim();
+    await setDoc(doc(fbDB, C_CONFIG, 'messages'), {retenu, non_retenu});
+    msgTemplates = {retenu, non_retenu};
+    toast('✅ Modèles enregistrés');
+    renderAdminInscriptions();
+  };
+
+  body.querySelectorAll('[data-select]').forEach(cb=>{
+    cb.onchange = ()=>{
+      if(cb.checked) inscSelected.add(cb.dataset.select); else inscSelected.delete(cb.dataset.select);
+      renderAdminInscriptions();
+    };
+  });
+  const bulkWa = document.getElementById('bulkWa'), bulkEmail = document.getElementById('bulkEmail'),
+        bulkSms = document.getElementById('bulkSms'), bulkClear = document.getElementById('bulkClear');
+  const selectedRecords = ()=> list.filter(r=>inscSelected.has(r.id));
+  if(bulkWa) bulkWa.onclick = ()=>{
+    selectedRecords().forEach(r=> window.open(decisionWaLink(r.telephone, r.prenom, r.decision==='non_retenu'?'non_retenu':'retenu'), '_blank'));
+    toast('📲 Liens WhatsApp ouverts — envoyez-les un par un');
+  };
+  if(bulkEmail) bulkEmail.onclick = ()=>{
+    const withEmail = selectedRecords().filter(r=>r.email);
+    withEmail.forEach(r=> window.open(decisionMailLink(r.email, r.prenom, r.decision==='non_retenu'?'non_retenu':'retenu'), '_blank'));
+    toast(withEmail.length ? "✉️ Liens Email ouverts" : "⚠️ Aucun élève sélectionné n'a fourni d'email");
+  };
+  if(bulkSms) bulkSms.onclick = ()=>{
+    selectedRecords().forEach(r=> window.open(decisionSmsLink(r.telephone, r.prenom, r.decision==='non_retenu'?'non_retenu':'retenu'), '_blank'));
+    toast('💬 Liens SMS ouverts');
+  };
+  if(bulkClear) bulkClear.onclick = ()=>{ inscSelected.clear(); renderAdminInscriptions(); };
+
   body.querySelectorAll('[data-status]').forEach(sel=>{
     sel.onchange = async ()=>{ await updateDoc(doc(fbDB, C_INSC, sel.dataset.status), {statut: sel.value}); toast('✅ Statut mis à jour'); };
+  });
+  body.querySelectorAll('[data-decision]').forEach(sel=>{
+    sel.onchange = async ()=>{
+      await updateDoc(doc(fbDB, C_INSC, sel.dataset.decision), {decision: sel.value});
+      toast('✅ Décision enregistrée');
+      renderAdminInscriptions();
+    };
+  });
+  body.querySelectorAll('[data-decision-send]').forEach(a=>{
+    a.addEventListener('click', async ()=>{
+      const id = a.dataset.decisionSend;
+      await updateDoc(doc(fbDB, C_INSC, id), {decisionNotifiee: true, decisionCanal: a.dataset.channel});
+      toast('✅ Notification marquée comme envoyée');
+      setTimeout(renderAdminInscriptions, 400);
+    });
   });
   body.querySelectorAll('[data-bienvenue]').forEach(a=>{
     a.addEventListener('click', async ()=>{
