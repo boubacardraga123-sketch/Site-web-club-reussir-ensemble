@@ -142,7 +142,10 @@ a{color:inherit}
 .site-nav{display:flex;gap:5px;overflow-x:auto;padding-top:14px}
 .site-nav button{background:var(--paper2);border:1.5px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;padding:10px 15px;font-family:var(--font-mono);font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);cursor:pointer;white-space:nowrap;transform:translateY(3px);transition:transform .15s,background .15s,color .15s}
 .site-nav button.active{background:var(--paper);color:var(--ink);transform:translateY(0);box-shadow:0 -2px 6px rgba(22,33,62,.08)}
-.site-body{background:var(--paper);border-top:1.5px solid var(--line);min-height:60vh;padding:28px 0 60px}
+.site-body{position:relative;background:var(--paper);border-top:1.5px solid var(--line);min-height:60vh;padding:28px 0 60px;overflow:hidden}
+.site-watermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:0}
+.site-watermark img{width:70%;max-width:640px;opacity:.06}
+.site-body>.wrap{position:relative;z-index:1}
 .rule-lines{background-image:repeating-linear-gradient(180deg, transparent, transparent 27px, var(--line-soft) 28px)}
 
 /* ── STAMP ── */
@@ -604,7 +607,7 @@ function bootSite(){
     </div>
     <div class="wrap"><div class="site-nav" id="siteNav"></div></div>
     </div>
-    <div class="site-body"><div class="wrap" id="siteBody"><div class="spinner"></div></div></div>
+    <div class="site-body"><div class="site-watermark"><img src="${CLUB_LOGO}" alt=""></div><div class="wrap" id="siteBody"><div class="spinner"></div></div></div>
     <div class="site-footer">Un projet de <strong>Club Réussir Ensemble</strong> — Mamou, Guinée<br><span style="font-family:'Space Mono',monospace;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase">Rigueur · Discipline · Travail</span>
       <div style="margin-top:12px;display:flex;gap:16px;justify-content:center">
         <a href="#" data-tab="contact" style="color:#9aa4c7;font-size:14px;text-decoration:underline">Contact</a>
