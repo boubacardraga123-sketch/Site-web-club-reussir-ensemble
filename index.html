@@ -190,8 +190,8 @@ a{color:inherit}
 /* ── GALLERY ── */
 .team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
 .team-card{background:var(--card);border:1px solid var(--line);border-radius:calc(var(--radius) - 2px);padding:18px 14px;text-align:center;box-shadow:0 2px 8px rgba(22,33,62,.06)}
-.team-avatar{width:76px;height:76px;border-radius:50%;border:2px dashed var(--gold);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:var(--font-mono);font-weight:700;font-size:20px;color:var(--gold)}
-.team-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.team-avatar{width:100%;aspect-ratio:4/3;border-radius:calc(var(--radius) - 4px);border:2px dashed var(--gold);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:var(--font-mono);font-weight:700;font-size:32px;color:var(--gold)}
+.team-avatar img{width:100%;height:100%;object-fit:cover;border-radius:calc(var(--radius) - 6px)}
 .team-card h3{font-size:16px;font-weight:700;margin-bottom:2px}
 .team-role{font-family:var(--font-mono);font-size:12.5px;color:var(--red);text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
 .team-bio{font-size:14px;color:var(--ink2);line-height:1.5;margin-bottom:10px}
