@@ -140,8 +140,15 @@ a{color:inherit}
 
 /* ── BINDER TABS ── */
 .site-nav{display:flex;gap:5px;overflow-x:auto;padding-top:14px}
-.site-nav button{background:var(--paper2);border:1.5px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;padding:10px 15px;font-family:var(--font-mono);font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);cursor:pointer;white-space:nowrap;transform:translateY(3px);transition:transform .15s,background .15s,color .15s}
+.site-nav button{background:var(--paper2);border:1.5px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;padding:10px 15px;font-family:var(--font-mono);font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);cursor:pointer;white-space:nowrap;transform:translateY(3px);transition:transform .15s,background .15s,color .15s;display:inline-flex;align-items:center;gap:5px}
 .site-nav button.active{background:var(--paper);color:var(--ink);transform:translateY(0);box-shadow:0 -2px 6px rgba(22,33,62,.08)}
+.site-nav button .care{font-size:9px;transition:transform .15s}
+.site-nav button.open .care{transform:rotate(180deg)}
+.site-subnav{overflow:hidden;max-height:0;transition:max-height .22s ease}
+.site-subnav.open{max-height:220px}
+.site-subnav-inner{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0 4px;border-bottom:1.5px solid var(--line)}
+.site-subnav-inner button{background:var(--paper2);border:1.5px solid var(--line);border-radius:20px;padding:8px 16px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2);cursor:pointer;white-space:nowrap}
+.site-subnav-inner button.active{background:var(--red);border-color:var(--red);color:#fff}
 .site-body{position:relative;background:var(--paper);border-top:1.5px solid var(--line);min-height:60vh;padding:28px 0 60px;overflow:hidden}
 .site-watermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:0}
 .site-watermark img{width:70%;max-width:640px;opacity:.06}
@@ -606,7 +613,9 @@ function bootSite(){
       </div>
       <button class="theme-toggle" id="themeToggle" title="Changer d'apparence" aria-label="Changer d'apparence"></button>
     </div>
-    <div class="wrap"><nav class="site-nav" id="siteNav" aria-label="Navigation principale"></nav></div>
+    <div class="wrap"><nav class="site-nav" id="siteNav" aria-label="Navigation principale"></nav>
+    <div class="site-subnav" id="siteSubnav"><div class="site-subnav-inner" id="siteSubnavInner"></div></div>
+    </div>
     </header>
     <main class="site-body"><div class="site-watermark"><img src="${CLUB_LOGO}" alt=""></div><div class="wrap" id="siteBody"><div class="spinner"></div></div></main>
     <footer class="site-footer">Un projet de <strong>Club Réussir Ensemble</strong> — Mamou, Guinée<br><span style="font-family:'Space Mono',monospace;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase">Rigueur · Discipline · Travail</span>
@@ -672,14 +681,54 @@ function wireAdminTrigger(){
   seal.addEventListener('pointerup', trigger);
 }
 
+let openNavGroup = null;
 function paintNav(){
-  const tabs = [['accueil','Accueil'],['actus','Actualités'],['evenements','Événements'],['galerie','Galerie'],['videos','Vidéos'],['equipe','Équipe'],['temoignages','Témoignages'],['sessions','Sessions'],['inscription','Inscription']];
-  document.getElementById('siteNav').innerHTML = tabs.map(([k,l])=>
-    `<button class="${siteTab===k?'active':''}" data-tab="${k}">${l}</button>`).join('');
-  document.getElementById('siteNav').querySelectorAll('button').forEach(b=>{
-    b.onclick = ()=>{ siteTab = b.dataset.tab; paintNav(); renderSiteTab(); };
+  const NAV = [
+    ['accueil','Accueil'],
+    ['actus','Actualités'],
+    {group:'evt', label:'Événements', children:[['evenements','Événements'],['sessions','Sessions']]},
+    {group:'med', label:'Médias', children:[['galerie','Galerie'],['videos','Vidéos']]},
+    {group:'club', label:'Le Club', children:[['equipe','Équipe'],['temoignages','Témoignages']]},
+    ['inscription','Inscription'],
+  ];
+  const groupOf = (k)=> { for(const it of NAV){ if(it.children && it.children.some(c=>c[0]===k)) return it; } return null; };
+  document.getElementById('siteNav').innerHTML = NAV.map(item=>{
+    if(item.children){
+      const containsActive = item.children.some(c=>c[0]===siteTab);
+      const isOpen = openNavGroup===item.group;
+      return `<button class="${containsActive?'active':''} ${isOpen?'open':''}" data-group="${item.group}">${item.label}<span class="care">▾</span></button>`;
+    }
+    const [k,l] = item;
+    return `<button class="${siteTab===k?'active':''}" data-tab="${k}">${l}</button>`;
+  }).join('');
+
+  document.getElementById('siteNav').querySelectorAll('button[data-tab]').forEach(b=>{
+    b.onclick = ()=>{ siteTab = b.dataset.tab; openNavGroup = null; paintNav(); renderSiteTab(); };
   });
+  document.getElementById('siteNav').querySelectorAll('button[data-group]').forEach(b=>{
+    b.onclick = (e)=>{ e.stopPropagation(); openNavGroup = openNavGroup===b.dataset.group ? null : b.dataset.group; paintNav(); };
+  });
+
+  const subnav = document.getElementById('siteSubnav');
+  const inner = document.getElementById('siteSubnavInner');
+  const openItem = NAV.find(it=>it.children && it.group===openNavGroup);
+  if(openItem){
+    inner.innerHTML = openItem.children.map(([k,l])=>
+      `<button class="${siteTab===k?'active':''}" data-tab="${k}">${l}</button>`).join('');
+    inner.querySelectorAll('button').forEach(b=>{
+      b.onclick = ()=>{ siteTab = b.dataset.tab; openNavGroup = null; paintNav(); renderSiteTab(); };
+    });
+    subnav.classList.add('open');
+  } else {
+    subnav.classList.remove('open');
+    inner.innerHTML = '';
+  }
 }
+document.addEventListener('click', (e)=>{
+  if(openNavGroup && !e.target.closest('#siteNav') && !e.target.closest('#siteSubnav')){
+    openNavGroup = null; paintNav();
+  }
+});
 
 function listenAll(){
   unsubs.push(onSnapshot(doc(fbDB, C_CONFIG, 'theme'), snap=>{
