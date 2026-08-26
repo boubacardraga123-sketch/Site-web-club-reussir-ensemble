@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#16213e">
+<meta name="theme-color" content="#161616">
 <script>
 (function(){
   try{
@@ -54,26 +54,26 @@
   }
 }
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;0,900;1,600&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;900&family=Work+Sans:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#0F2F63; --ink2:#3E63A8;
-  --paper:#FBFCFF; --paper2:#E8F1FC;
+  --ink:#161616; --ink2:#4d4d4d;
+  --paper:#FFFFFF; --paper2:#F4F4F4;
   --card:#fff;
-  --red:#FF5A3C; --gold:#2E7FE3;
-  --line: rgba(15,47,99,.15);
-  --line-soft: rgba(15,47,99,.07);
-  --font-title: 'Fraunces', serif;
+  --red:#E4132B; --gold:#B8101F;
+  --line: rgba(20,20,20,.15);
+  --line-soft: rgba(20,20,20,.07);
+  --font-title: 'Work Sans', sans-serif;
   --font-body: 'Work Sans', sans-serif;
   --font-mono: 'Space Mono', monospace;
-  --radius: 8px;
+  --radius: 4px;
 }
 [data-theme="dark"]{
-  --ink:#E9EEFC; --ink2:#9FB0DD;
-  --paper:#141B34; --paper2:#0A0F20;
-  --card:#1B2444;
-  --line: rgba(233,238,252,.14);
-  --line-soft: rgba(233,238,252,.07);
+  --ink:#F5F5F5; --ink2:#B5B5B5;
+  --paper:#161616; --paper2:#0D0D0D;
+  --card:#1E1E1E;
+  --line: rgba(245,245,245,.14);
+  --line-soft: rgba(245,245,245,.07);
 }
 [data-theme="dark"] .topbar,
 [data-theme="dark"] .admin-top,
@@ -81,7 +81,7 @@
 [data-theme="dark"] .toast,
 [data-theme="dark"] .btn-ink,
 [data-theme="dark"] .admin-tabs button.active{
-  background:#0A0F20; color:#F2F5FF; border-color:#0A0F20;
+  background:#0D0D0D; color:#F5F5F5; border-color:#0D0D0D;
 }
 [data-theme="dark"] .site-footer strong{ color:#fff; }
 [data-theme="dark"] .lightbox .cap,
@@ -123,7 +123,7 @@ body{
   font-family:var(--font-body);color:var(--ink);min-height:100vh;
   font-size:16px;
 }
-h1,h2,h3{font-family:var(--font-title);color:var(--ink);line-height:1.08}
+h1,h2,h3{font-family:var(--font-title);color:var(--ink);line-height:1.1;font-weight:800;text-transform:uppercase;letter-spacing:.01em}
 .hidden{display:none!important}
 .wrap{max-width:1080px;margin:0 auto;padding:0 16px}
 a{color:inherit}
@@ -131,12 +131,12 @@ a{color:inherit}
 /* ── TOPBAR ── */
 .topbar{background:var(--ink);color:var(--paper);padding:14px 0}
 .topbar .row{display:flex;align-items:center;gap:12px}
-.brand-seal{width:44px;height:44px;border-radius:50%;border:2px dashed var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;font-size:15px;color:var(--gold);flex-shrink:0;overflow:hidden}
-.brand-seal img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.brand-seal{width:auto;height:60px;min-width:60px;border-radius:6px;border:none;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;font-size:15px;color:var(--gold);flex-shrink:0;overflow:hidden;padding:4px 8px}
+.brand-seal img{width:auto;height:100%;max-width:160px;object-fit:contain;border-radius:2px}
 .brand-txt{flex:1;min-width:0}
 .brand-txt .n{font-family:var(--font-title);font-weight:700;font-size:18px}
-.brand-txt .m{font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#9aa4c7;margin-top:1px}
-.admin-link{font-family:var(--font-mono);font-size:12px;color:#7c86ab;text-decoration:none;border:1px solid #3b4568;border-radius:calc(var(--radius) - 2px);padding:5px 9px;white-space:nowrap}
+.brand-txt .m{font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#a8a8a8;margin-top:1px}
+.admin-link{font-family:var(--font-mono);font-size:12px;color:#9a9a9a;text-decoration:none;border:1px solid #3a3a3a;border-radius:calc(var(--radius) - 2px);padding:5px 9px;white-space:nowrap}
 
 /* ── BINDER TABS ── */
 .site-nav{display:flex;gap:5px;overflow-x:auto;padding-top:14px}
@@ -157,7 +157,7 @@ a{color:inherit}
 /* ── HERO ── */
 .hero{padding:34px 0 26px;text-align:center}
 .hero .motto-stamp{display:inline-block;border:2px dashed var(--red);color:var(--red);font-family:var(--font-mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:6px 16px;border-radius:30px;transform:rotate(-2deg);margin-bottom:16px}
-.hero h1{font-size:clamp(30px,6vw,48px);font-style:italic;font-weight:700;max-width:620px;margin:0 auto}
+.hero h1{font-size:clamp(28px,6vw,44px);font-style:normal;font-weight:800;max-width:680px;margin:0 auto}
 .hero p.lead{max-width:520px;margin:14px auto 0;color:var(--ink2);font-size:16.5px;line-height:1.6}
 .hero-actions{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
 
@@ -272,7 +272,7 @@ label.f-label{display:block;font-size:13.5px;font-weight:700;color:var(--ink2);m
 .confirm-box .stamp .d{font-size:26px}
 
 /* ── FOOTER ── */
-.site-footer{background:var(--ink);color:#9aa4c7;padding:22px 0;text-align:center;font-size:14px}
+.site-footer{background:var(--ink);color:#a8a8a8;padding:22px 0;text-align:center;font-size:14px}
 .site-footer strong{color:var(--paper)}
 .map-embed{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 2px 8px rgba(22,33,62,.06)}
 
@@ -313,6 +313,7 @@ label.a-label{display:block;font-size:13.5px;font-weight:700;color:var(--ink2);m
   .wrap{padding:0 12px}
   .topbar{padding:12px 0}
   .topbar .row{flex-wrap:wrap}
+  .brand-seal{height:46px;min-width:46px}
   .brand-txt .n{font-size:16.5px}
   .site-nav button{padding:9px 12px;font-size:12.5px}
   .hero{padding:26px 0 18px}
@@ -391,7 +392,7 @@ function initTheme(){
   const preferDark = saved ? saved==='dark' : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   document.documentElement.setAttribute('data-theme', preferDark ? 'dark' : 'light');
   const mc = document.querySelector('meta[name=theme-color]');
-  if(mc) mc.setAttribute('content', preferDark ? '#0A0F20' : '#16213e');
+  if(mc) mc.setAttribute('content', preferDark ? '#0D0D0D' : '#161616');
 }
 function toggleTheme(){
   const isDark = document.documentElement.getAttribute('data-theme')==='dark';
@@ -399,7 +400,7 @@ function toggleTheme(){
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('cre_theme', next);
   const mc = document.querySelector('meta[name=theme-color]');
-  if(mc) mc.setAttribute('content', next==='dark' ? '#0A0F20' : '#16213e');
+  if(mc) mc.setAttribute('content', next==='dark' ? '#0D0D0D' : '#161616');
 }
 initTheme();
 
@@ -500,7 +501,7 @@ function generatePdfRetenus(retenus){
 }
 function esc0(s){ return (s??'').toString(); }
 
-const DEFAULT_THEME = { ink:'#0F2F63', ink2:'#3E63A8', paper:'#FBFCFF', paper2:'#E8F1FC', red:'#FF5A3C', gold:'#2E7FE3', fontTitle:'Fraunces', fontBody:'Work Sans', radius:'8' };
+const DEFAULT_THEME = { ink:'#161616', ink2:'#4d4d4d', paper:'#FFFFFF', paper2:'#F4F4F4', red:'#E4132B', gold:'#B8101F', fontTitle:'Poppins', fontBody:'Work Sans', radius:'4' };
 
 /* Polices proposées dans l'admin : nom Google Fonts -> déclaration CSS complète */
 const FONT_TITLE_OPTIONS = {
@@ -597,7 +598,7 @@ function marqueeHTML(){
 function bootSite(){
   app.innerHTML = `
     ${marqueeHTML()}
-    <div class="topbar"><div class="wrap row">
+    <header class="topbar"><div class="wrap row">
       <div class="brand-seal">${CLUB_LOGO_IMG}</div>
       <div class="brand-txt">
         <div class="n">Club Réussir Ensemble</div>
@@ -605,15 +606,15 @@ function bootSite(){
       </div>
       <button class="theme-toggle" id="themeToggle" title="Changer d'apparence" aria-label="Changer d'apparence"></button>
     </div>
-    <div class="wrap"><div class="site-nav" id="siteNav"></div></div>
-    </div>
-    <div class="site-body"><div class="site-watermark"><img src="${CLUB_LOGO}" alt=""></div><div class="wrap" id="siteBody"><div class="spinner"></div></div></div>
-    <div class="site-footer">Un projet de <strong>Club Réussir Ensemble</strong> — Mamou, Guinée<br><span style="font-family:'Space Mono',monospace;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase">Rigueur · Discipline · Travail</span>
+    <div class="wrap"><nav class="site-nav" id="siteNav" aria-label="Navigation principale"></nav></div>
+    </header>
+    <main class="site-body"><div class="site-watermark"><img src="${CLUB_LOGO}" alt=""></div><div class="wrap" id="siteBody"><div class="spinner"></div></div></main>
+    <footer class="site-footer">Un projet de <strong>Club Réussir Ensemble</strong> — Mamou, Guinée<br><span style="font-family:'Space Mono',monospace;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase">Rigueur · Discipline · Travail</span>
       <div style="margin-top:12px;display:flex;gap:16px;justify-content:center">
-        <a href="#" data-tab="contact" style="color:#9aa4c7;font-size:14px;text-decoration:underline">Contact</a>
-        <a href="#" data-tab="confidentialite" style="color:#9aa4c7;font-size:14px;text-decoration:underline">Confidentialité</a>
+        <a href="#" data-tab="contact" style="color:#a8a8a8;font-size:14px;text-decoration:underline">Contact</a>
+        <a href="#" data-tab="confidentialite" style="color:#a8a8a8;font-size:14px;text-decoration:underline">Confidentialité</a>
       </div>
-    </div>
+    </footer>
     <button class="avis-fab" id="avisFab">💬 Exprimez-vous</button>
     <a class="wa-fab" id="waFab" href="${waLink(CONTACT_TEL)}" target="_blank" rel="noopener" aria-label="Contacter sur WhatsApp" title="Contacter sur WhatsApp">
       <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2Zm0 18.13h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.11.82.83-3.03-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24Zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.17.24-.64.81-.78.97-.14.17-.29.19-.53.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.24-.86.84-.86 2.06s.88 2.4 1 2.56c.12.17 1.73 2.64 4.2 3.7.59.25 1.04.4 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.23-.17-.48-.29Z"/></svg>
@@ -807,7 +808,7 @@ async function renderContactMap(){
       maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
     }).addTo(map);
     const icon = L.divIcon({
-      className: '', html: `<div style="width:26px;height:26px;border-radius:50%;background:#FF5A3C;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)"></div>`,
+      className: '', html: `<div style="width:26px;height:26px;border-radius:50%;background:#E4132B;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)"></div>`,
       iconSize: [26,26], iconAnchor: [13,13]
     });
     L.marker([lat, lng], { icon }).addTo(map).bindPopup('Club Réussir Ensemble').openPopup();
@@ -1083,13 +1084,13 @@ function tplInscription(){
   <div class="fiche">
     <div class="fiche-head"><div class="tag">Club Réussir Ensemble</div><h2>Fiche d'inscription</h2></div>
     <form id="inscForm">
-      <label class="f-label">Nom</label><input type="text" name="nom" required>
-      <label class="f-label">Prénom</label><input type="text" name="prenom" required>
-      <label class="f-label">Téléphone (WhatsApp)</label><input type="tel" name="telephone" required placeholder="622 00 00 00">
-      <label class="f-label">Email (optionnel)</label><input type="email" name="email" placeholder="exemple@mail.com">
-      <label class="f-label">Classe</label><input type="text" name="classe" required placeholder="ex : 10e Année">
-      <label class="f-label">Filière (si applicable)</label><input type="text" name="filiere" placeholder="SM, SS, ...">
-      <label class="f-label">Message (optionnel)</label><textarea name="message" placeholder="Une question, une remarque ?"></textarea>
+      <label class="f-label" for="insc-nom">Nom</label><input id="insc-nom" type="text" name="nom" required>
+      <label class="f-label" for="insc-prenom">Prénom</label><input id="insc-prenom" type="text" name="prenom" required>
+      <label class="f-label" for="insc-telephone">Téléphone (WhatsApp)</label><input id="insc-telephone" type="tel" name="telephone" required placeholder="622 00 00 00">
+      <label class="f-label" for="insc-email">Email (optionnel)</label><input id="insc-email" type="email" name="email" placeholder="exemple@mail.com">
+      <label class="f-label" for="insc-classe">Classe</label><input id="insc-classe" type="text" name="classe" required placeholder="ex : 10e Année">
+      <label class="f-label" for="insc-filiere">Filière (si applicable)</label><input id="insc-filiere" type="text" name="filiere" placeholder="SM, SS, ...">
+      <label class="f-label" for="insc-message">Message (optionnel)</label><textarea id="insc-message" name="message" placeholder="Une question, une remarque ?"></textarea>
       <div style="margin-top:18px"><button type="submit" class="btn btn-red" style="width:100%;justify-content:center">Envoyer ma fiche</button></div>
     </form>
   </div>`;
@@ -1137,7 +1138,7 @@ function wireSiteBody(){
 function openLightbox(url, cap){
   const lb = document.createElement('div');
   lb.className = 'lightbox';
-  lb.innerHTML = `<button class="close">✕</button><img src="${esc(url)}">${cap?`<div class="cap">${esc(cap)}</div>`:''}`;
+  lb.innerHTML = `<button class="close" aria-label="Fermer">✕</button><img src="${esc(url)}" alt="${cap?esc(cap):'Photo agrandie'}">${cap?`<div class="cap">${esc(cap)}</div>`:''}`;
   lb.onclick = e=>{ if(e.target===lb || e.target.classList.contains('close')) lb.remove(); };
   document.body.appendChild(lb);
 }
@@ -1149,11 +1150,11 @@ function openAvisPanel(){
   overlay.className = 'avis-overlay';
   overlay.innerHTML = `
     <div class="avis-panel">
-      <div class="avis-head"><h3>💬 Exprimez-vous</h3><button class="close">✕</button></div>
+      <div class="avis-head"><h3>💬 Exprimez-vous</h3><button class="close" aria-label="Fermer">✕</button></div>
       <div class="avis-list" id="avisList"><div class="spinner"></div></div>
       <form class="avis-form" id="avisForm">
-        <input type="text" name="nom" placeholder="Votre nom (optionnel)" maxlength="60">
-        <textarea name="texte" placeholder="Votre avis, question ou message..." required maxlength="500"></textarea>
+        <input type="text" name="nom" aria-label="Votre nom (optionnel)" placeholder="Votre nom (optionnel)" maxlength="60">
+        <textarea name="texte" aria-label="Votre avis, question ou message" placeholder="Votre avis, question ou message..." required maxlength="500"></textarea>
         <button type="submit" class="btn btn-red" style="justify-content:center">Envoyer</button>
       </form>
     </div>`;
@@ -1538,7 +1539,7 @@ async function renderAdminGalerie(){
     <div class="a-card"><h3>Photos publiées (${list.length})</h3>
       ${list.length ? list.map(g=>`
         <div class="a-row">
-          <img src="${esc(g.url)}" style="width:52px;height:52px;object-fit:cover;border-radius:6px;flex-shrink:0">
+          <img src="${esc(g.url)}" alt="${esc(g.legende||'Photo de la galerie')}" style="width:52px;height:52px;object-fit:cover;border-radius:6px;flex-shrink:0">
           <div class="main"><div class="t1">${esc(g.legende||'Sans légende')}</div></div>
           <button class="btn btn-outline btn-sm" data-del="${g.id}">Supprimer</button>
         </div>`).join('') : '<div class="empty-note">Aucune photo.</div>'}
