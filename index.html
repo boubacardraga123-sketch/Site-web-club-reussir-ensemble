@@ -2543,8 +2543,8 @@ function wireAdminMatieres(list){
         date: fd.get('date') ? new Date(fd.get('date')).getTime() : null,
         consignes: (fd.get('consignes')||'').trim(),
         dateLimite: fd.get('dateLimite') ? new Date(fd.get('dateLimite')).getTime() : null,
-        questions: type==='quiz' ? [] : undefined,
         ordre: (m.lecons||[]).length };
+      if(type==='quiz') lecon.questions = [];
       try{
         await updateDoc(doc(fbDB, C_MATIERES, matiereId), { lecons: [...(m.lecons||[]), lecon] });
         toast('✅ Leçon ajoutée'); openMatiereAdmin = matiereId; renderAdminMatieres();
