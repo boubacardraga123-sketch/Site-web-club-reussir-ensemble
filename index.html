@@ -194,6 +194,16 @@ a{color:inherit}
 .evt-card .txt .meta{font-family:var(--font-mono);font-size:13px;color:var(--ink2);margin-bottom:6px}
 .evt-card .txt p{font-size:15px;color:var(--ink2);line-height:1.5}
 .evt-card .txt .lnk{margin-top:8px}
+.course-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:5px 11px;border-radius:20px}
+.course-badge.attente{background:#fdf1d6;color:#9a6b00}
+.course-badge.refuse{background:#fbe0e0;color:var(--red)}
+.course-badge.valide{background:#dff3e6;color:#1a8f4c}
+.course-lecon{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line-soft)}
+.course-lecon:first-child{border-top:none}
+.course-lecon .ic{font-size:20px}
+.course-lecon .info{flex:1;min-width:0}
+.course-lecon .info .t{font-weight:700;font-size:14.5px}
+.course-lecon .info .d{font-size:13px;color:var(--ink2)}
 .actu-thumb{width:72px;height:72px;object-fit:cover;border-radius:calc(var(--radius) - 2px);flex-shrink:0}
 .empty-note{text-align:center;color:var(--ink2);font-size:15.5px;padding:30px 10px;border:1.5px dashed var(--line);border-radius:var(--radius)}
 
@@ -349,8 +359,11 @@ label.a-label{display:block;font-size:13.5px;font-weight:700;color:var(--ink2);m
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc,
-         deleteDoc, updateDoc, query, orderBy, onSnapshot
+         deleteDoc, updateDoc, query, orderBy, where, onSnapshot
        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+         signOut, onAuthStateChanged, updateProfile
+       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 /* ── Même projet Firebase que les autres apps du Club (emploi-temps) ── */
 const firebaseConfig = {
@@ -363,9 +376,7 @@ const firebaseConfig = {
 };
 const fbApp = initializeApp(firebaseConfig);
 const fbDB  = getFirestore(fbApp);
-
-/* ── Code d'accès admin — à modifier ── */
-const ADMIN_CODE = "REUSSIR2026";
+const fbAuth = getAuth(fbApp);
 
 /* ── Collections ── */
 const C_EVT   = 'site_evenements';
@@ -378,6 +389,14 @@ const C_TEMOIN = 'site_temoignages';
 const C_SESS  = 'site_sessions';
 const C_ACTUS = 'site_actus';
 const C_EQUIPE = 'site_equipe';
+const C_MATIERES = 'site_matieres';
+const C_PAIEMENTS = 'site_paiements';
+const C_QUIZ_RES = 'site_quiz_resultats';
+const C_DEVOIRS = 'site_devoirs_soumissions';
+
+/* ── Numéro Mobile Money du club pour le paiement des cours en ligne ── */
+const COURS_MOMO_NUM = '625655839';
+const COURS_MOMO_OPERATEUR = 'Orange Money';
 
 /* ── Emblème du club : livre ouvert dessiné en SVG (aucune image externe) ── */
 const BRAND_ICON = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -582,6 +601,13 @@ let events = [], gallery = [], videos = [], temoignages = [], sessions = [], act
 let sessionsError = null, actusError = null, temoignagesError = null, equipeError = null;
 let siteConfig = {};
 let siteStats = {};
+let currentUser = null;
+let matieres = [], matieresError = null;
+let mesPaiements = [];
+let mesQuizResultats = [];
+let mesDevoirsSoumissions = [];
+let openQuiz = null;
+let coursAuthMode = 'login';
 let unsubs = [];
 
 const MOTIVATION_QUOTES = [
@@ -689,6 +715,7 @@ function paintNav(){
     {group:'evt', label:'Événements', children:[['evenements','Événements'],['sessions','Sessions']]},
     {group:'med', label:'Médias', children:[['galerie','Galerie'],['videos','Vidéos']]},
     {group:'club', label:'Le Club', children:[['equipe','Équipe'],['temoignages','Témoignages']]},
+    ['cours','Cours en ligne'],
     ['inscription','Inscription'],
   ];
   const groupOf = (k)=> { for(const it of NAV){ if(it.children && it.children.some(c=>c[0]===k)) return it; } return null; };
@@ -791,7 +818,38 @@ function listenAll(){
     equipeError = err.code || err.message || 'erreur inconnue';
     if(siteTab==='equipe') renderSiteTab();
   }));
+  unsubs.push(onSnapshot(query(collection(fbDB, C_MATIERES), orderBy('ordre','asc')), snap=>{
+    matieres = snap.docs.map(d=>({id:d.id,...d.data()}));
+    matieresError = null;
+    if(siteTab==='cours') renderSiteTab();
+  }, err=>{
+    console.error('Erreur chargement matières (site_matieres) :', err);
+    matieresError = err.code || err.message || 'erreur inconnue';
+    if(siteTab==='cours') renderSiteTab();
+  }));
 }
+
+function listenMesPaiements(){
+  if(!currentUser) { mesPaiements = []; mesQuizResultats = []; mesDevoirsSoumissions = []; return; }
+  unsubs.push(onSnapshot(query(collection(fbDB, C_PAIEMENTS), where('uid','==',currentUser.uid)), snap=>{
+    mesPaiements = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(siteTab==='cours') renderSiteTab();
+  }, err=>{ console.error('Erreur chargement paiements :', err); }));
+  unsubs.push(onSnapshot(query(collection(fbDB, C_QUIZ_RES), where('uid','==',currentUser.uid)), snap=>{
+    mesQuizResultats = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(siteTab==='cours') renderSiteTab();
+  }, err=>{ console.error('Erreur chargement résultats QCM :', err); }));
+  unsubs.push(onSnapshot(query(collection(fbDB, C_DEVOIRS), where('uid','==',currentUser.uid)), snap=>{
+    mesDevoirsSoumissions = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(siteTab==='cours') renderSiteTab();
+  }, err=>{ console.error('Erreur chargement devoirs :', err); }));
+}
+
+onAuthStateChanged(fbAuth, user=>{
+  currentUser = user;
+  if(user) listenMesPaiements(); else mesPaiements = [];
+  if(siteTab==='cours') renderSiteTab();
+});
 
 function renderSiteTab(){
   const body = document.getElementById('siteBody');
@@ -804,6 +862,7 @@ function renderSiteTab(){
   else if(siteTab==='equipe') body.innerHTML = tplEquipe();
   else if(siteTab==='temoignages') body.innerHTML = tplTemoignages();
   else if(siteTab==='sessions') body.innerHTML = tplSessions();
+  else if(siteTab==='cours') { body.innerHTML = tplCours(); wireCoursBody(); }
   else if(siteTab==='inscription') body.innerHTML = tplInscription();
   else if(siteTab==='contact') { body.innerHTML = tplContact(); renderContactMap(); }
   else if(siteTab==='confidentialite') body.innerHTML = tplConfidentialite();
@@ -1145,6 +1204,283 @@ function tplInscription(){
   </div>`;
 }
 
+/* ═══════════════ COURS EN LIGNE ═══════════════ */
+function tplCours(){
+  if(!currentUser) return tplCoursAuth();
+  if(matieresError) return `<div class="fiche"><p style="color:var(--red)">Erreur de chargement des matières : ${esc(matieresError)}</p></div>`;
+  const nom = currentUser.displayName || currentUser.email;
+  return `
+  <div class="fiche-head"><div class="tag">Club Réussir Ensemble</div><h2>Cours en ligne</h2></div>
+  <div class="a-row" style="max-width:640px;margin:0 auto 18px;justify-content:space-between;align-items:center">
+    <div class="t2">Connecté(e) en tant que <b>${esc(nom)}</b></div>
+    <button class="btn btn-outline btn-sm" id="coursLogout">Se déconnecter</button>
+  </div>
+  <div style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
+    ${matieres.length ? matieres.map(m=>tplMatiereCard(m)).join('') : '<div class="empty-note">Aucune matière disponible pour le moment.</div>'}
+  </div>`;
+}
+
+function tplCoursAuth(){
+  const isLogin = coursAuthMode==='login';
+  return `
+  <div class="fiche">
+    <div class="fiche-head"><div class="tag">Club Réussir Ensemble</div><h2>Cours en ligne</h2></div>
+    <p style="text-align:center;color:var(--ink2);font-size:14.5px;margin-bottom:16px">Créez un compte ou connectez-vous pour accéder aux matières disponibles.</p>
+    <div class="a-row" style="justify-content:center;gap:8px;margin-bottom:16px">
+      <button class="btn ${isLogin?'btn-ink':'btn-outline'} btn-sm" id="modeLogin" type="button">Connexion</button>
+      <button class="btn ${!isLogin?'btn-ink':'btn-outline'} btn-sm" id="modeSignup" type="button">Créer un compte</button>
+    </div>
+    <form id="coursAuthForm">
+      ${!isLogin ? `
+      <label class="f-label" for="ca-prenom">Prénom</label><input id="ca-prenom" type="text" name="prenom" required>
+      <label class="f-label" for="ca-nom">Nom</label><input id="ca-nom" type="text" name="nom" required>
+      <label class="f-label" for="ca-telephone">Téléphone</label><input id="ca-telephone" type="tel" name="telephone" required placeholder="622 00 00 00">` : ''}
+      <label class="f-label" for="ca-email">Email</label><input id="ca-email" type="email" name="email" required placeholder="exemple@mail.com">
+      <label class="f-label" for="ca-password">Mot de passe</label><input id="ca-password" type="password" name="password" required minlength="6" placeholder="6 caractères minimum">
+      <div id="coursAuthErr" style="color:var(--red);font-size:13.5px;margin-top:8px"></div>
+      <div style="margin-top:18px"><button type="submit" class="btn btn-red" style="width:100%;justify-content:center">${isLogin?'Se connecter':'Créer mon compte'}</button></div>
+    </form>
+  </div>`;
+}
+
+function tplMatiereCard(m){
+  const p = mesPaiements.filter(pp=>pp.matiereId===m.id).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))[0];
+  const statut = p ? p.statut : null;
+  const prixTxt = m.prix ? `${Number(m.prix).toLocaleString('fr-FR')} GNF` : 'Gratuit';
+  let statusHtml = '';
+  if(statut==='valide'){
+    statusHtml = `<span class="course-badge valide">✅ Accès actif</span>`;
+  } else if(statut==='attente'){
+    statusHtml = `<span class="course-badge attente">⏳ Paiement en attente de validation</span>`;
+  } else if(statut==='refuse'){
+    statusHtml = `<span class="course-badge refuse">❌ Paiement refusé</span> <button class="btn btn-red btn-sm" data-pay="${m.id}" style="margin-top:8px">Réessayer le paiement</button>`;
+  } else {
+    statusHtml = `<button class="btn btn-red btn-sm" data-pay="${m.id}">S'inscrire — ${prixTxt}</button>`;
+  }
+  const lecons = statut==='valide' ? (m.lecons||[]).slice().sort((a,b)=>(a.ordre??999)-(b.ordre??999)) : [];
+  return `
+  <div class="evt-card" style="flex-direction:column;align-items:stretch">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+      <div><h3>${esc(m.nom)}</h3>${m.prof?`<div class="meta">Encadré par ${esc(m.prof)}</div>`:''}</div>
+      <div>${statusHtml}</div>
+    </div>
+    ${m.description?`<p>${esc(m.description)}</p>`:''}
+    ${statut==='valide' ? `
+      <div style="margin-top:10px">
+        ${lecons.length ? lecons.map(l=>tplLecon(l, m.id)).join('') : '<div class="empty-note">Aucune leçon publiée pour le moment.</div>'}
+      </div>` : ''}
+  </div>`;
+}
+
+function tplLecon(l, matiereId){
+  if(l.type==='video'){
+    return `<div class="course-lecon"><div class="ic">🎬</div><div class="info"><div class="t">${esc(l.titre)}</div>
+      <div class="d"><a href="${esc(l.url)}" target="_blank" rel="noopener">Regarder la vidéo →</a></div></div></div>`;
+  }
+  if(l.type==='pdf'){
+    return `<div class="course-lecon"><div class="ic">📄</div><div class="info"><div class="t">${esc(l.titre)}</div>
+      <div class="d"><a href="${esc(l.url)}" target="_blank" rel="noopener">Ouvrir le document →</a></div></div></div>`;
+  }
+  if(l.type==='quiz') return tplQuizLecon(l, matiereId);
+  if(l.type==='devoir') return tplDevoirLecon(l, matiereId);
+  return `<div class="course-lecon"><div class="ic">🔴</div><div class="info"><div class="t">${esc(l.titre)}</div>
+    <div class="d">Session en direct — ${l.date?fmtFull(l.date):'date à venir'}${l.url?` · <a href="${esc(l.url)}" target="_blank" rel="noopener">Rejoindre →</a>`:''}</div></div></div>`;
+}
+
+function tplQuizLecon(l, matiereId){
+  const questions = l.questions||[];
+  const dernier = mesQuizResultats.filter(r=>r.leconId===l.id).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))[0];
+  const isOpen = openQuiz && openQuiz.leconId===l.id;
+  if(isOpen){
+    return `
+    <div class="course-lecon" style="flex-direction:column;align-items:stretch">
+      <div style="display:flex;gap:10px;align-items:center"><div class="ic">📝</div><div class="info"><div class="t">${esc(l.titre)}</div></div></div>
+      <form data-quizform="${matiereId}|${l.id}" style="margin-top:10px;display:flex;flex-direction:column;gap:14px">
+        ${questions.map((q,qi)=>`
+          <div>
+            <div style="font-weight:700;font-size:14.5px;margin-bottom:6px">${qi+1}. ${esc(q.texte)}</div>
+            ${q.options.map((o,oi)=>`
+              <label style="display:flex;align-items:center;gap:8px;font-size:14px;padding:4px 0">
+                <input type="radio" name="q${qi}" value="${oi}" required> ${esc(o)}
+              </label>`).join('')}
+          </div>`).join('')}
+        <div style="display:flex;gap:8px">
+          <button type="submit" class="btn btn-red btn-sm">Valider mes réponses</button>
+          <button type="button" class="btn btn-outline btn-sm" data-cancelquiz="1">Annuler</button>
+        </div>
+      </form>
+    </div>`;
+  }
+  return `
+  <div class="course-lecon">
+    <div class="ic">📝</div>
+    <div class="info"><div class="t">${esc(l.titre)}</div>
+      <div class="d">${questions.length} question(s)${dernier?` · Dernier score : <b>${dernier.score}/${dernier.total}</b>`:''}</div>
+    </div>
+    <button class="btn btn-outline btn-sm" data-startquiz="${matiereId}|${l.id}">${dernier?'Repasser le QCM':'Commencer le QCM'}</button>
+  </div>`;
+}
+
+function tplDevoirLecon(l, matiereId){
+  const soum = mesDevoirsSoumissions.filter(s=>s.leconId===l.id).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))[0];
+  let statusHtml;
+  if(!soum){
+    statusHtml = `
+      <form data-devoirform="${matiereId}|${l.id}" style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+        <textarea class="a-in" name="contenu" rows="3" placeholder="Votre réponse, ou collez ici le lien de votre fichier (Google Drive, photo...)" required></textarea>
+        <button type="submit" class="btn btn-red btn-sm" style="align-self:flex-start">Rendre le devoir</button>
+      </form>`;
+  } else if(soum.statut==='corrige'){
+    statusHtml = `<div class="course-badge valide">✅ Noté : ${soum.note}/20</div>${soum.commentaire?`<div class="d" style="margin-top:6px">💬 ${esc(soum.commentaire)}</div>`:''}`;
+  } else {
+    statusHtml = `<span class="course-badge attente">⏳ En attente de correction</span>`;
+  }
+  return `
+  <div class="course-lecon" style="flex-direction:column;align-items:stretch">
+    <div style="display:flex;gap:10px;align-items:flex-start"><div class="ic">📚</div>
+      <div class="info"><div class="t">${esc(l.titre)}</div>
+        ${l.consignes?`<div class="d">${esc(l.consignes)}</div>`:''}
+        ${l.dateLimite?`<div class="d">À rendre avant le ${fmtFull(l.dateLimite)}</div>`:''}
+      </div>
+    </div>
+    <div style="margin-top:6px">${statusHtml}</div>
+  </div>`;
+}
+
+function openPayModal(matiereId){
+  const m = matieres.find(x=>x.id===matiereId);
+  if(!m) return;
+  const prixTxt = m.prix ? `${Number(m.prix).toLocaleString('fr-FR')} GNF` : 'Gratuit';
+  const overlay = document.createElement('div');
+  overlay.className = 'avis-overlay';
+  overlay.innerHTML = `
+    <div class="avis-panel">
+      <div class="avis-head"><h3>💳 Paiement — ${esc(m.nom)}</h3><button class="close" aria-label="Fermer">✕</button></div>
+      <div style="padding:16px 18px 4px">
+        <p style="font-size:14.5px;color:var(--ink2);margin-bottom:10px">Montant à payer : <b>${prixTxt}</b></p>
+        <p style="font-size:14.5px;color:var(--ink2);margin-bottom:14px">1. Envoyez ce montant via <b>${esc(COURS_MOMO_OPERATEUR)}</b> au numéro <b>${esc(COURS_MOMO_NUM)}</b>.<br>2. Indiquez ci-dessous la référence de la transaction reçue par SMS.<br>3. Votre accès sera activé après validation par l'administration (généralement sous 24h).</p>
+      </div>
+      <form class="avis-form" id="payForm">
+        <input type="tel" name="telephone" placeholder="Votre numéro de téléphone" required>
+        <input type="text" name="reference" placeholder="Référence de la transaction" required>
+        <button type="submit" class="btn btn-red" style="justify-content:center">Envoyer ma preuve de paiement</button>
+      </form>
+    </div>`;
+  document.body.appendChild(overlay);
+  const closeIt = ()=> overlay.remove();
+  overlay.onclick = e=>{ if(e.target===overlay) closeIt(); };
+  overlay.querySelector('.close').onclick = closeIt;
+  overlay.querySelector('#payForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const btn = e.target.querySelector('button[type=submit]');
+    btn.disabled = true; btn.textContent = 'Envoi...';
+    try{
+      await addDoc(collection(fbDB, C_PAIEMENTS), {
+        uid: currentUser.uid, eleveEmail: currentUser.email, eleveNom: currentUser.displayName||'',
+        matiereId: m.id, matiereNom: m.nom, montant: m.prix||0,
+        telephone: fd.get('telephone').trim(), reference: fd.get('reference').trim(),
+        statut: 'attente', createdAt: Date.now()
+      });
+      toast('✅ Preuve envoyée — en attente de validation');
+      closeIt();
+    }catch(err){ toast('❌ '+err.message); btn.disabled=false; btn.textContent="Envoyer ma preuve de paiement"; }
+  });
+}
+
+function wireCoursBody(){
+  if(!currentUser){
+    document.getElementById('modeLogin').onclick = ()=>{ coursAuthMode='login'; renderSiteTab(); };
+    document.getElementById('modeSignup').onclick = ()=>{ coursAuthMode='signup'; renderSiteTab(); };
+    document.getElementById('coursAuthForm').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const email = fd.get('email').trim(), password = fd.get('password');
+      const errEl = document.getElementById('coursAuthErr');
+      errEl.textContent = '';
+      const btn = e.target.querySelector('button[type=submit]');
+      btn.disabled = true;
+      try{
+        if(coursAuthMode==='login'){
+          await signInWithEmailAndPassword(fbAuth, email, password);
+        } else {
+          const prenom = fd.get('prenom').trim(), nom = fd.get('nom').trim(), telephone = fd.get('telephone').trim();
+          const cred = await createUserWithEmailAndPassword(fbAuth, email, password);
+          await updateProfile(cred.user, { displayName: `${prenom} ${nom}` });
+          await setDoc(doc(fbDB, 'site_eleves', cred.user.uid), { uid: cred.user.uid, prenom, nom, telephone, email, createdAt: Date.now() });
+        }
+      }catch(err){
+        errEl.textContent = traduireErreurAuth(err.code);
+        btn.disabled = false;
+      }
+    });
+    return;
+  }
+  document.getElementById('coursLogout').onclick = ()=> signOut(fbAuth);
+  document.querySelectorAll('[data-pay]').forEach(b=>{
+    b.onclick = ()=> openPayModal(b.dataset.pay);
+  });
+  document.querySelectorAll('[data-startquiz]').forEach(b=>{
+    b.onclick = ()=>{ const [matiereId, leconId] = b.dataset.startquiz.split('|'); openQuiz = {matiereId, leconId}; renderSiteTab(); };
+  });
+  document.querySelectorAll('[data-cancelquiz]').forEach(b=>{
+    b.onclick = ()=>{ openQuiz = null; renderSiteTab(); };
+  });
+  document.querySelectorAll('[data-quizform]').forEach(f=>{
+    f.addEventListener('submit', async e=>{
+      e.preventDefault();
+      const [matiereId, leconId] = f.dataset.quizform.split('|');
+      const m = matieres.find(x=>x.id===matiereId);
+      const lecon = m ? (m.lecons||[]).find(l=>l.id===leconId) : null;
+      if(!lecon) return;
+      const fd = new FormData(f);
+      let score = 0;
+      lecon.questions.forEach((q,qi)=>{ if(parseInt(fd.get('q'+qi),10)===q.correct) score++; });
+      try{
+        await addDoc(collection(fbDB, C_QUIZ_RES), {
+          uid: currentUser.uid, eleveNom: currentUser.displayName||currentUser.email,
+          matiereId, matiereNom: m.nom, leconId, leconTitre: lecon.titre,
+          score, total: lecon.questions.length, createdAt: Date.now()
+        });
+        toast(`✅ Score : ${score}/${lecon.questions.length}`);
+        openQuiz = null; renderSiteTab();
+      }catch(err){ toast('❌ '+err.message); }
+    });
+  });
+  document.querySelectorAll('[data-devoirform]').forEach(f=>{
+    f.addEventListener('submit', async e=>{
+      e.preventDefault();
+      const [matiereId, leconId] = f.dataset.devoirform.split('|');
+      const m = matieres.find(x=>x.id===matiereId);
+      const lecon = m ? (m.lecons||[]).find(l=>l.id===leconId) : null;
+      const fd = new FormData(f);
+      const btn = f.querySelector('button[type=submit]');
+      btn.disabled = true;
+      try{
+        await addDoc(collection(fbDB, C_DEVOIRS), {
+          uid: currentUser.uid, eleveNom: currentUser.displayName||currentUser.email,
+          matiereId, matiereNom: m?m.nom:'', leconId, leconTitre: lecon?lecon.titre:'',
+          contenu: fd.get('contenu').trim(), statut: 'attente', createdAt: Date.now()
+        });
+        toast('✅ Devoir envoyé'); renderSiteTab();
+      }catch(err){ toast('❌ '+err.message); btn.disabled=false; }
+    });
+  });
+}
+
+function traduireErreurAuth(code){
+  const map = {
+    'auth/email-already-in-use': 'Un compte existe déjà avec cet email.',
+    'auth/invalid-email': 'Adresse email invalide.',
+    'auth/weak-password': 'Mot de passe trop court (6 caractères minimum).',
+    'auth/user-not-found': 'Aucun compte avec cet email.',
+    'auth/wrong-password': 'Mot de passe incorrect.',
+    'auth/invalid-credential': 'Email ou mot de passe incorrect.',
+  };
+  return map[code] || 'Une erreur est survenue. Veuillez réessayer.';
+}
+
+
 function wireSiteBody(){
   document.querySelectorAll('#siteBody [data-tab]').forEach(el=>{
     if(el.tagName==='BUTTON' && el.dataset.tab && !el.hasAttribute('onclick')){
@@ -1241,24 +1577,58 @@ function openAvisPanel(){
 }
 
 /* ══════════════════════════════ ESPACE ADMIN ══════════════════════════════ */
+/* Connexion via Firebase Auth (même compte admin que les autres apps du Club,
+   vérifié via la collection "admins" partagée par le projet emploi-temps). */
 function bootAdmin(){
-  const saved = sessionStorage.getItem('creAdminOK');
-  if(saved === '1'){ loadMsgTemplates(); renderAdminShell(); return; }
+  if(fbAuth.currentUser){ checkAdminAndEnter(fbAuth.currentUser); return; }
   app.innerHTML = `
     <div class="center-box">
       <div class="stamp ink"><div class="d">🔒</div></div>
       <h2>Espace admin</h2>
-      <p>Entrez le code d'accès formateur pour gérer le contenu du site.</p>
-      <input type="password" id="codeIn" placeholder="Code d'accès" autofocus>
-      <div class="hero-actions" style="margin-top:14px"><button class="btn btn-ink" id="codeBtn">Entrer</button></div>
+      <p>Connectez-vous avec votre compte administrateur pour gérer le contenu du site.</p>
+      <input type="email" id="adminEmail" placeholder="Email" autocomplete="username" autofocus>
+      <input type="password" id="adminPass" placeholder="Mot de passe" autocomplete="current-password" style="margin-top:8px">
+      <div class="hero-actions" style="margin-top:14px"><button class="btn btn-ink" id="adminLoginBtn">Se connecter</button></div>
+      <p id="adminLoginErr" style="color:#c0392b;font-size:13px;margin-top:10px"></p>
     </div>`;
-  const go = ()=>{
-    const v = document.getElementById('codeIn').value.trim();
-    if(v === ADMIN_CODE){ sessionStorage.setItem('creAdminOK','1'); loadMsgTemplates(); renderAdminShell(); }
-    else toast('❌ Code incorrect');
+  const go = async ()=>{
+    const email = document.getElementById('adminEmail').value.trim();
+    const pass  = document.getElementById('adminPass').value;
+    const errEl = document.getElementById('adminLoginErr');
+    errEl.textContent = '';
+    if(!email || !pass) return;
+    const btn = document.getElementById('adminLoginBtn');
+    btn.disabled = true; btn.textContent = 'Connexion...';
+    try{
+      const cred = await signInWithEmailAndPassword(fbAuth, email, pass);
+      await checkAdminAndEnter(cred.user);
+    }catch(err){
+      errEl.textContent = 'Connexion refusée : identifiants incorrects.';
+      btn.disabled = false; btn.textContent = 'Se connecter';
+    }
   };
-  document.getElementById('codeBtn').onclick = go;
-  document.getElementById('codeIn').addEventListener('keydown', e=>{ if(e.key==='Enter') go(); });
+  document.getElementById('adminLoginBtn').onclick = go;
+  document.getElementById('adminPass').addEventListener('keydown', e=>{ if(e.key==='Enter') go(); });
+}
+
+async function checkAdminAndEnter(user){
+  try{
+    const snap = await getDoc(doc(fbDB, 'admins', user.uid));
+    if(snap.exists()){
+      loadMsgTemplates(); renderAdminShell();
+    } else {
+      await signOut(fbAuth);
+      app.innerHTML = `
+        <div class="center-box">
+          <div class="stamp ink"><div class="d">⛔</div></div>
+          <h2>Accès refusé</h2>
+          <p>Ce compte n'a pas les droits administrateur.</p>
+          <div class="hero-actions" style="margin-top:14px"><button class="btn btn-ink" onclick="location.href=location.pathname">Retour au site</button></div>
+        </div>`;
+    }
+  }catch(err){
+    toast('❌ '+err.message);
+  }
 }
 
 let adminTab = 'evenements';
@@ -1270,6 +1640,7 @@ function renderAdminShell(){
         <h1>Espace admin — Club Réussir Ensemble</h1>
         <button class="theme-toggle" id="themeToggleAdmin" title="Changer d'apparence" aria-label="Changer d'apparence" style="margin-right:8px"></button>
         <a class="admin-link" href="${location.pathname}" target="_self">Voir le site</a>
+        <a class="admin-link" href="#" id="adminLogoutLink" style="margin-left:8px">Déconnexion</a>
       </div></div>
       <div class="wrap">
         <div class="admin-tabs" id="aTabs"></div>
@@ -1277,13 +1648,14 @@ function renderAdminShell(){
       </div>
     </div>`;
   paintATabs(); renderAdminTab();
+  document.getElementById('adminLogoutLink').onclick = async (e)=>{ e.preventDefault(); await signOut(fbAuth); location.href = location.pathname; };
   const tt = document.getElementById('themeToggleAdmin');
   const paintTT = ()=>{ tt.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙'; };
   paintTT();
   tt.onclick = ()=>{ toggleTheme(); paintTT(); };
 }
 function paintATabs(){
-  const tabs = [['apropos','📝 Vision & valeurs'],['stats','📊 Statistiques'],['couleurs','🎨 Design'],['actus','📰 Actualités'],['evenements','📅 Événements'],['sessions','🗓️ Sessions'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['equipe','👥 Équipe'],['temoignages','💬 Témoignages'],['inscriptions','📋 Inscriptions'],['avis','💬 Avis']];
+  const tabs = [['apropos','📝 Vision & valeurs'],['stats','📊 Statistiques'],['couleurs','🎨 Design'],['actus','📰 Actualités'],['evenements','📅 Événements'],['sessions','🗓️ Sessions'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['equipe','👥 Équipe'],['temoignages','💬 Témoignages'],['matieres','🎓 Cours en ligne'],['paiements','💳 Paiements'],['inscriptions','📋 Inscriptions'],['avis','💬 Avis']];
   document.getElementById('aTabs').innerHTML = tabs.map(([k,l])=>`<button class="${adminTab===k?'active':''}" data-t="${k}">${l}</button>`).join('');
   document.getElementById('aTabs').querySelectorAll('button').forEach(b=>{
     b.onclick = ()=>{ adminTab=b.dataset.t; paintATabs(); renderAdminTab(); };
@@ -1305,7 +1677,8 @@ async function renderAdminTab(){
   if(adminTab==='temoignages') return renderAdminTemoignages();
   if(adminTab==='inscriptions') return renderAdminInscriptions();
   if(adminTab==='avis') return renderAdminAvis();
-  if(adminTab==='avis') return renderAdminAvis();
+  if(adminTab==='matieres') return renderAdminMatieres();
+  if(adminTab==='paiements') return renderAdminPaiements();
 }
 
 /* ── Admin: Vision & valeurs ── */
@@ -1949,6 +2322,303 @@ async function renderAdminAvis(){
   body.querySelectorAll('[data-del]').forEach(b=>{
     b.onclick = async ()=>{ if(!confirm('Supprimer ce message ?')) return;
       await deleteDoc(doc(fbDB, C_AVIS, b.dataset.del)); toast('🗑️ Supprimé'); renderAdminAvis(); };
+  });
+}
+
+/* ── Admin : Cours en ligne (matières + leçons) ── */
+let openMatiereAdmin = null;
+async function renderAdminMatieres(){
+  const body = document.getElementById('aBody');
+  const snap = await getDocs(query(collection(fbDB, C_MATIERES), orderBy('ordre','asc')));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+  body.innerHTML = `
+    <div class="a-card">
+      <h3>➕ Nouvelle matière</h3>
+      <form id="matForm">
+        <label class="a-label">Nom de la matière</label><input class="a-in" name="nom" required placeholder="ex : Mathématiques — 10e Année">
+        <label class="a-label">Professeur / encadrant</label><input class="a-in" name="prof" placeholder="ex : M. Diallo">
+        <label class="a-label">Prix (en GNF)</label><input class="a-in" type="number" name="prix" min="0" required placeholder="ex : 50000">
+        <label class="a-label">Description</label><textarea class="a-in" name="description" rows="3" placeholder="Contenu du cours, objectifs..."></textarea>
+        <label class="a-label">Ordre d'affichage</label><input class="a-in" type="number" name="ordre" value="${list.length}">
+        <div style="margin-top:12px"><button class="btn btn-ink btn-sm" type="submit">Créer la matière</button></div>
+      </form>
+    </div>
+    <div class="a-card"><h3>Matières (${list.length})</h3>
+      ${list.length ? list.map(m=>tplAdminMatiereRow(m)).join('') : '<div class="empty-note">Aucune matière créée.</div>'}
+    </div>`;
+  document.getElementById('matForm').addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const fd = new FormData(ev.target);
+    const data = { nom: fd.get('nom').trim(), prof: (fd.get('prof')||'').trim(),
+      prix: parseInt(fd.get('prix'),10)||0, description: (fd.get('description')||'').trim(),
+      ordre: parseInt(fd.get('ordre'),10)||0, lecons: [], createdAt: Date.now() };
+    try{ await addDoc(collection(fbDB, C_MATIERES), data); toast('✅ Matière créée'); renderAdminMatieres(); }
+    catch(err){ toast('❌ '+err.message); }
+  });
+  wireAdminMatieres(list);
+}
+
+function tplAdminMatiereRow(m){
+  const isOpen = openMatiereAdmin===m.id;
+  const lecons = (m.lecons||[]).slice().sort((a,b)=>(a.ordre??999)-(b.ordre??999));
+  const iconOf = t=> t==='video'?'🎬':t==='pdf'?'📄':t==='quiz'?'📝':t==='devoir'?'📚':'🔴';
+  return `
+    <div class="a-row" style="flex-direction:column;align-items:stretch">
+      <div class="main"><div class="t1">${esc(m.nom)}</div><div class="t2">${Number(m.prix||0).toLocaleString('fr-FR')} GNF${m.prof?' · '+esc(m.prof):''} · ${lecons.length} leçon(s)</div></div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="btn btn-outline btn-sm" data-toggle="${m.id}">${isOpen?'Fermer':'Gérer les leçons'}</button>
+        <button class="btn btn-outline btn-sm" data-del="${m.id}">Supprimer la matière</button>
+      </div>
+      ${isOpen ? `
+      <div class="a-card" style="margin-top:10px;background:var(--paper2)">
+        <h3 style="font-size:15px">Ajouter une leçon</h3>
+        <form data-leconform="${m.id}">
+          <label class="a-label">Type</label>
+          <select class="a-in" name="type" data-typeselect>
+            <option value="video">🎬 Vidéo</option>
+            <option value="pdf">📄 Document / PDF</option>
+            <option value="live">🔴 Session en direct</option>
+            <option value="quiz">📝 QCM (auto-corrigé)</option>
+            <option value="devoir">📚 Devoir à rendre</option>
+          </select>
+          <label class="a-label">Titre</label><input class="a-in" name="titre" required>
+          <label class="a-label">Lien (vidéo, PDF ou visio)</label><input class="a-in" name="url" placeholder="https://...">
+          <label class="a-label">Date (session en direct)</label><input class="a-in" type="datetime-local" name="date">
+          <label class="a-label">Consignes (devoir)</label><textarea class="a-in" name="consignes" rows="2" placeholder="Ce que l'élève doit faire et rendre"></textarea>
+          <label class="a-label">Date limite (devoir)</label><input class="a-in" type="date" name="dateLimite">
+          <div style="margin-top:10px"><button class="btn btn-ink btn-sm" type="submit">Ajouter la leçon</button></div>
+        </form>
+        <div style="margin-top:14px">
+          ${lecons.length ? lecons.map((l,i)=>`
+            <div class="a-row" style="flex-direction:column;align-items:stretch">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                <div class="main"><div class="t1">${iconOf(l.type)} ${esc(l.titre)}</div>
+                  <div class="t2">${l.type==='quiz'?(l.questions||[]).length+' question(s)':''}${l.date?fmtFull(l.date):''}${l.dateLimite?'À rendre avant le '+fmtFull(l.dateLimite):''}${l.url?' · '+esc(l.url):''}</div></div>
+                <div style="display:flex;gap:6px">
+                  ${l.type==='quiz' ? `<button class="btn btn-outline btn-sm" data-quiztoggle="${m.id}|${l.id}">${openQuizAdmin===(m.id+'|'+l.id)?'Fermer':'Gérer les questions'}</button><button class="btn btn-outline btn-sm" data-quizresults="${m.id}|${l.id}">Voir les résultats</button>` : ''}
+                  ${l.type==='devoir' ? `<button class="btn btn-outline btn-sm" data-corriger="${m.id}|${l.id}">Corriger les copies</button>` : ''}
+                  <button class="btn btn-outline btn-sm" data-dellecon="${m.id}" data-index="${i}">Supprimer</button>
+                </div>
+              </div>
+              ${l.type==='quiz' && openQuizAdmin===(m.id+'|'+l.id) ? tplAdminQuizBuilder(m.id, l) : ''}
+            </div>`).join('') : '<div class="empty-note">Aucune leçon pour cette matière.</div>'}
+        </div>
+      </div>` : ''}
+    </div>`;
+}
+
+function tplAdminQuizBuilder(matiereId, lecon){
+  const qs = lecon.questions||[];
+  return `
+    <div class="a-card" style="margin-top:8px">
+      <h3 style="font-size:14px">➕ Ajouter une question</h3>
+      <form data-questionform="${matiereId}|${lecon.id}">
+        <label class="a-label">Question</label><input class="a-in" name="texte" required>
+        <label class="a-label">Option 1</label><input class="a-in" name="opt0" required>
+        <label class="a-label">Option 2</label><input class="a-in" name="opt1" required>
+        <label class="a-label">Option 3</label><input class="a-in" name="opt2">
+        <label class="a-label">Option 4</label><input class="a-in" name="opt3">
+        <label class="a-label">Bonne réponse</label>
+        <select class="a-in" name="correct">
+          <option value="0">Option 1</option><option value="1">Option 2</option>
+          <option value="2">Option 3</option><option value="3">Option 4</option>
+        </select>
+        <div style="margin-top:10px"><button class="btn btn-ink btn-sm" type="submit">Ajouter la question</button></div>
+      </form>
+      <div style="margin-top:12px">
+        ${qs.length ? qs.map((q,qi)=>`
+          <div class="a-row"><div class="main"><div class="t1">${qi+1}. ${esc(q.texte)}</div>
+            <div class="t2">Bonne réponse : ${esc(q.options[q.correct])}</div></div>
+            <button class="btn btn-outline btn-sm" data-delquestion="${matiereId}|${lecon.id}" data-qindex="${qi}">Supprimer</button>
+          </div>`).join('') : '<div class="empty-note">Aucune question pour le moment.</div>'}
+      </div>
+    </div>`;
+}
+
+function wireAdminMatieres(list){
+  const body = document.getElementById('aBody');
+  body.querySelectorAll('[data-toggle]').forEach(b=>{
+    b.onclick = ()=>{ openMatiereAdmin = openMatiereAdmin===b.dataset.toggle ? null : b.dataset.toggle; renderAdminMatieres(); };
+  });
+  body.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = async ()=>{ if(!confirm('Supprimer cette matière et toutes ses leçons ?')) return;
+      await deleteDoc(doc(fbDB, C_MATIERES, b.dataset.del)); toast('🗑️ Matière supprimée'); renderAdminMatieres(); };
+  });
+  body.querySelectorAll('[data-leconform]').forEach(f=>{
+    f.addEventListener('submit', async ev=>{
+      ev.preventDefault();
+      const matiereId = f.dataset.leconform;
+      const m = list.find(x=>x.id===matiereId);
+      const fd = new FormData(f);
+      const type = fd.get('type');
+      const id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(36).slice(2));
+      const lecon = { id, type, titre: fd.get('titre').trim(), url: (fd.get('url')||'').trim(),
+        date: fd.get('date') ? new Date(fd.get('date')).getTime() : null,
+        consignes: (fd.get('consignes')||'').trim(),
+        dateLimite: fd.get('dateLimite') ? new Date(fd.get('dateLimite')).getTime() : null,
+        questions: type==='quiz' ? [] : undefined,
+        ordre: (m.lecons||[]).length };
+      try{
+        await updateDoc(doc(fbDB, C_MATIERES, matiereId), { lecons: [...(m.lecons||[]), lecon] });
+        toast('✅ Leçon ajoutée'); openMatiereAdmin = matiereId; renderAdminMatieres();
+      }catch(err){ toast('❌ '+err.message); }
+    });
+  });
+  body.querySelectorAll('[data-quiztoggle]').forEach(b=>{
+    b.onclick = ()=>{ openQuizAdmin = openQuizAdmin===b.dataset.quiztoggle ? null : b.dataset.quiztoggle; renderAdminMatieres(); };
+  });
+  body.querySelectorAll('[data-corriger]').forEach(b=>{
+    b.onclick = ()=>{ const [matiereId, leconId] = b.dataset.corriger.split('|'); renderAdminCorrection(matiereId, leconId); };
+  });
+  body.querySelectorAll('[data-quizresults]').forEach(b=>{
+    b.onclick = ()=>{ const [matiereId, leconId] = b.dataset.quizresults.split('|'); renderAdminQuizResults(matiereId, leconId); };
+  });
+  body.querySelectorAll('[data-questionform]').forEach(f=>{
+    f.addEventListener('submit', async ev=>{
+      ev.preventDefault();
+      const [matiereId, leconId] = f.dataset.questionform.split('|');
+      const m = list.find(x=>x.id===matiereId);
+      const fd = new FormData(f);
+      const options = [fd.get('opt0'),fd.get('opt1'),fd.get('opt2'),fd.get('opt3')].map(o=>(o||'').trim()).filter(Boolean);
+      const question = { texte: fd.get('texte').trim(), options, correct: parseInt(fd.get('correct'),10) };
+      const newLecons = (m.lecons||[]).map(l=> l.id===leconId ? {...l, questions:[...(l.questions||[]), question]} : l);
+      try{
+        await updateDoc(doc(fbDB, C_MATIERES, matiereId), { lecons: newLecons });
+        toast('✅ Question ajoutée'); renderAdminMatieres();
+      }catch(err){ toast('❌ '+err.message); }
+    });
+  });
+  body.querySelectorAll('[data-delquestion]').forEach(b=>{
+    b.onclick = async ()=>{
+      const [matiereId, leconId] = b.dataset.delquestion.split('|');
+      const qi = parseInt(b.dataset.qindex,10);
+      const m = list.find(x=>x.id===matiereId);
+      const newLecons = (m.lecons||[]).map(l=> l.id===leconId ? {...l, questions:(l.questions||[]).filter((_,i)=>i!==qi)} : l);
+      try{
+        await updateDoc(doc(fbDB, C_MATIERES, matiereId), { lecons: newLecons });
+        toast('🗑️ Question supprimée'); renderAdminMatieres();
+      }catch(err){ toast('❌ '+err.message); }
+    };
+  });
+  body.querySelectorAll('[data-dellecon]').forEach(b=>{
+    b.onclick = async ()=>{
+      const matiereId = b.dataset.dellecon, idx = parseInt(b.dataset.index,10);
+      const m = list.find(x=>x.id===matiereId);
+      const newLecons = (m.lecons||[]).filter((_,i)=>i!==idx);
+      try{
+        await updateDoc(doc(fbDB, C_MATIERES, matiereId), { lecons: newLecons });
+        toast('🗑️ Leçon supprimée'); openMatiereAdmin = matiereId; renderAdminMatieres();
+      }catch(err){ toast('❌ '+err.message); }
+    };
+  });
+}
+
+/* ── Admin : validation des paiements Mobile Money ── */
+async function renderAdminPaiements(){
+  const body = document.getElementById('aBody');
+  const snap = await getDocs(query(collection(fbDB, C_PAIEMENTS), orderBy('createdAt','desc')));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+  const enAttente = list.filter(p=>p.statut==='attente');
+  const traites = list.filter(p=>p.statut!=='attente');
+  body.innerHTML = `
+    <div class="a-card"><h3>⏳ En attente de validation (${enAttente.length})</h3>
+      ${enAttente.length ? enAttente.map(p=>tplAdminPaiementRow(p,true)).join('') : '<div class="empty-note">Aucun paiement en attente.</div>'}
+    </div>
+    <div class="a-card"><h3>Historique (${traites.length})</h3>
+      ${traites.length ? traites.map(p=>tplAdminPaiementRow(p,false)).join('') : '<div class="empty-note">Aucun paiement traité.</div>'}
+    </div>`;
+  body.querySelectorAll('[data-valider]').forEach(b=>{
+    b.onclick = async ()=>{
+      await updateDoc(doc(fbDB, C_PAIEMENTS, b.dataset.valider), { statut: 'valide', validatedAt: Date.now() });
+      toast("✅ Accès activé pour l'élève"); renderAdminPaiements();
+    };
+  });
+  body.querySelectorAll('[data-refuser]').forEach(b=>{
+    b.onclick = async ()=>{ if(!confirm('Refuser ce paiement ?')) return;
+      await updateDoc(doc(fbDB, C_PAIEMENTS, b.dataset.refuser), { statut: 'refuse', validatedAt: Date.now() });
+      toast('❌ Paiement refusé'); renderAdminPaiements();
+    };
+  });
+}
+
+function tplAdminPaiementRow(p, showActions){
+  const badge = p.statut==='valide' ? '<span class="course-badge valide">✅ Validé</span>'
+    : p.statut==='refuse' ? '<span class="course-badge refuse">❌ Refusé</span>'
+    : '<span class="course-badge attente">⏳ En attente</span>';
+  return `
+    <div class="a-row">
+      <div class="main">
+        <div class="t1">${esc(p.eleveNom||p.eleveEmail)} — ${esc(p.matiereNom)}</div>
+        <div class="t2">${Number(p.montant||0).toLocaleString('fr-FR')} GNF · Tél : ${esc(p.telephone)} · Réf : ${esc(p.reference)} · ${new Date(p.createdAt).toLocaleDateString('fr-FR')}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        ${badge}
+        ${showActions ? `<button class="btn btn-ink btn-sm" data-valider="${p.id}">Valider</button><button class="btn btn-outline btn-sm" data-refuser="${p.id}">Refuser</button>` : ''}
+      </div>
+    </div>`;
+}
+
+/* ── Admin : résultats d'un QCM ── */
+async function renderAdminQuizResults(matiereId, leconId){
+  const body = document.getElementById('aBody');
+  body.innerHTML = '<div class="spinner"></div>';
+  const msnap = await getDoc(doc(fbDB, C_MATIERES, matiereId));
+  const m = msnap.exists() ? {id:msnap.id,...msnap.data()} : null;
+  const lecon = m ? (m.lecons||[]).find(l=>l.id===leconId) : null;
+  const snap = await getDocs(query(collection(fbDB, C_QUIZ_RES), where('leconId','==',leconId)));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  const moyenne = list.length ? (list.reduce((s,r)=>s+(r.score/r.total),0)/list.length*20).toFixed(1) : '—';
+  body.innerHTML = `
+    <div class="a-card">
+      <button class="btn btn-outline btn-sm" id="backToMatieres">← Retour aux matières</button>
+      <h3 style="margin-top:10px">📝 Résultats — ${esc(lecon?lecon.titre:'')} (${esc(m?m.nom:'')})</h3>
+      <p class="t2">Moyenne de la classe : <b>${moyenne}${moyenne!=='—'?'/20':''}</b> · ${list.length} tentative(s)</p>
+      ${list.length ? list.map(r=>`
+        <div class="a-row"><div class="main"><div class="t1">${esc(r.eleveNom)}</div>
+          <div class="t2">${new Date(r.createdAt).toLocaleDateString('fr-FR')}</div></div>
+          <div class="t1">${r.score}/${r.total}</div>
+        </div>`).join('') : '<div class="empty-note">Personne n\\u2019a encore passé ce QCM.</div>'}
+    </div>`;
+  document.getElementById('backToMatieres').onclick = ()=>{ adminTab='matieres'; paintATabs(); renderAdminTab(); };
+}
+
+/* ── Admin : correction des devoirs ── */
+async function renderAdminCorrection(matiereId, leconId){
+  const body = document.getElementById('aBody');
+  body.innerHTML = '<div class="spinner"></div>';
+  const msnap = await getDoc(doc(fbDB, C_MATIERES, matiereId));
+  const m = msnap.exists() ? {id:msnap.id,...msnap.data()} : null;
+  const lecon = m ? (m.lecons||[]).find(l=>l.id===leconId) : null;
+  const snap = await getDocs(query(collection(fbDB, C_DEVOIRS), where('leconId','==',leconId)));
+  const list = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  body.innerHTML = `
+    <div class="a-card">
+      <button class="btn btn-outline btn-sm" id="backToMatieres">← Retour aux matières</button>
+      <h3 style="margin-top:10px">📚 Copies — ${esc(lecon?lecon.titre:'')} (${esc(m?m.nom:'')})</h3>
+      ${list.length ? list.map(s=>`
+        <div class="a-row" style="flex-direction:column;align-items:stretch">
+          <div class="main"><div class="t1">${esc(s.eleveNom||s.eleveEmail)}</div>
+            <div class="t2">${new Date(s.createdAt).toLocaleDateString('fr-FR')} — ${esc(s.contenu)}</div></div>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">
+            <input class="a-in" style="width:90px;margin-top:0" type="number" min="0" max="20" placeholder="/20" data-note="${s.id}" value="${s.note??''}">
+            <input class="a-in" style="flex:1;min-width:180px;margin-top:0" placeholder="Commentaire (optionnel)" data-comment="${s.id}" value="${esc(s.commentaire||'')}">
+            <button class="btn btn-ink btn-sm" data-grade="${s.id}">${s.statut==='corrige'?'Mettre à jour':'Noter'}</button>
+          </div>
+          ${s.statut==='corrige'?'<div class="course-badge valide" style="margin-top:6px">✅ Corrigé</div>':'<div class="course-badge attente" style="margin-top:6px">⏳ Non corrigé</div>'}
+        </div>`).join('') : '<div class="empty-note">Aucune copie rendue pour le moment.</div>'}
+    </div>`;
+  document.getElementById('backToMatieres').onclick = ()=>{ adminTab='matieres'; paintATabs(); renderAdminTab(); };
+  body.querySelectorAll('[data-grade]').forEach(b=>{
+    b.onclick = async ()=>{
+      const id = b.dataset.grade;
+      const note = parseFloat(body.querySelector(`[data-note="${id}"]`).value);
+      const commentaire = body.querySelector(`[data-comment="${id}"]`).value.trim();
+      if(isNaN(note)){ toast('⚠️ Merci d\\u2019indiquer une note'); return; }
+      try{
+        await updateDoc(doc(fbDB, C_DEVOIRS, id), { note, commentaire, statut:'corrige', corrigeAt: Date.now() });
+        toast('✅ Copie notée'); renderAdminCorrection(matiereId, leconId);
+      }catch(err){ toast('❌ '+err.message); }
+    };
   });
 }
 
