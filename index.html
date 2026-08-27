@@ -1424,6 +1424,7 @@ function tplDevoirLecon(l, matiereId){
     <div style="display:flex;gap:10px;align-items:flex-start"><div class="ic">📚</div>
       <div class="info"><div class="t">${esc(l.titre)}</div>
         ${l.consignes?`<div class="d">${esc(l.consignes)}</div>`:''}
+        ${l.url?`<div class="d"><a href="${esc(l.url)}" target="_blank" rel="noopener">📎 Voir le sujet →</a></div>`:''}
         ${l.dateLimite?`<div class="d">À rendre avant le ${fmtFull(l.dateLimite)}</div>`:''}
       </div>
     </div>
@@ -2414,10 +2415,17 @@ async function renderAdminAvis(){
 
 /* ── Admin : Cours en ligne (matières + leçons) ── */
 let openMatiereAdmin = null;
+let leconFormType = 'video';
+let leconQuizDraft = [];
+let matieresAdminList = [];
 async function renderAdminMatieres(){
-  const body = document.getElementById('aBody');
   const snap = await getDocs(query(collection(fbDB, C_MATIERES), orderBy('ordre','asc')));
-  const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+  matieresAdminList = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderAdminMatieresBody();
+}
+function renderAdminMatieresBody(){
+  const body = document.getElementById('aBody');
+  const list = matieresAdminList;
   body.innerHTML = `
     <div class="a-card">
       <h3>➕ Nouvelle matière</h3>
@@ -2459,22 +2467,15 @@ function tplAdminMatiereRow(m){
       ${isOpen ? `
       <div class="a-card" style="margin-top:10px;background:var(--paper2)">
         <h3 style="font-size:15px">Ajouter une leçon</h3>
-        <form data-leconform="${m.id}">
-          <label class="a-label">Type</label>
-          <select class="a-in" name="type" data-typeselect>
-            <option value="video">🎬 Vidéo</option>
-            <option value="pdf">📄 Document / PDF</option>
-            <option value="live">🔴 Session en direct</option>
-            <option value="quiz">📝 QCM (auto-corrigé)</option>
-            <option value="devoir">📚 Devoir à rendre</option>
-          </select>
-          <label class="a-label">Titre</label><input class="a-in" name="titre" required>
-          <label class="a-label">Lien (vidéo, PDF ou visio)</label><input class="a-in" name="url" placeholder="https://...">
-          <label class="a-label">Date (session en direct)</label><input class="a-in" type="datetime-local" name="date">
-          <label class="a-label">Consignes (devoir)</label><textarea class="a-in" name="consignes" rows="2" placeholder="Ce que l'élève doit faire et rendre"></textarea>
-          <label class="a-label">Date limite (devoir)</label><input class="a-in" type="date" name="dateLimite">
-          <div style="margin-top:10px"><button class="btn btn-ink btn-sm" type="submit">Ajouter la leçon</button></div>
-        </form>
+        <label class="a-label">Type</label>
+        <select class="a-in" id="leconTypeSelect">
+          <option value="video" ${leconFormType==='video'?'selected':''}>🎬 Vidéo</option>
+          <option value="pdf" ${leconFormType==='pdf'?'selected':''}>📄 Document / PDF</option>
+          <option value="live" ${leconFormType==='live'?'selected':''}>🔴 Session en direct</option>
+          <option value="quiz" ${leconFormType==='quiz'?'selected':''}>📝 QCM (auto-corrigé)</option>
+          <option value="devoir" ${leconFormType==='devoir'?'selected':''}>📚 Devoir à rendre</option>
+        </select>
+        ${leconFormType==='quiz' ? tplQuizBuilderForm(m.id) : tplLeconSimpleForm(m.id, leconFormType)}
         <div style="margin-top:14px">
           ${lecons.length ? lecons.map((l,i)=>`
             <div class="a-row" style="flex-direction:column;align-items:stretch">
@@ -2491,6 +2492,54 @@ function tplAdminMatiereRow(m){
             </div>`).join('') : '<div class="empty-note">Aucune leçon pour cette matière.</div>'}
         </div>
       </div>` : ''}
+    </div>`;
+}
+
+function tplLeconSimpleForm(matiereId, type){
+  return `
+    <form data-leconform="${matiereId}">
+      <label class="a-label">Titre</label><input class="a-in" name="titre" required>
+      ${(type==='video'||type==='pdf') ? `<label class="a-label">Lien (${type==='video'?'vidéo':'PDF'})</label><input class="a-in" name="url" required placeholder="https://...">` : ''}
+      ${type==='live' ? `<label class="a-label">Lien de la visio</label><input class="a-in" name="url" placeholder="https://...">
+      <label class="a-label">Date de la session</label><input class="a-in" type="datetime-local" name="date" required>` : ''}
+      ${type==='devoir' ? `<label class="a-label">Lien du sujet (PDF, Drive, photo scannée...)</label><input class="a-in" name="url" placeholder="https://... (facultatif si tout est dans les consignes)">
+      <label class="a-label">Consignes</label><textarea class="a-in" name="consignes" rows="3" placeholder="Ce que l'élève doit faire et rendre" required></textarea>
+      <label class="a-label">Date limite</label><input class="a-in" type="date" name="dateLimite">` : ''}
+      <div style="margin-top:10px"><button class="btn btn-ink btn-sm" type="submit">Ajouter la leçon</button></div>
+    </form>`;
+}
+
+function tplQuizBuilderForm(matiereId){
+  return `
+    <div style="margin-top:8px">
+      <label class="a-label">Titre du QCM</label><input class="a-in" id="quizTitreInput" placeholder="ex : QCM — Chapitre 1">
+      <div style="margin-top:12px">
+        <h4 style="font-size:13.5px;font-weight:700;margin-bottom:6px">Questions ajoutées (${leconQuizDraft.length})</h4>
+        ${leconQuizDraft.length ? leconQuizDraft.map((q,qi)=>`
+          <div class="a-row"><div class="main"><div class="t1">${qi+1}. ${esc(q.texte)}</div>
+            <div class="t2">Bonne réponse : ${esc(q.options[q.correct]||'')}</div></div>
+            <button class="btn btn-outline btn-sm" data-delquizdraft="${qi}">Supprimer</button>
+          </div>`).join('') : '<div class="empty-note">Aucune question ajoutée pour l\u2019instant.</div>'}
+      </div>
+      <div class="a-card" style="margin-top:10px">
+        <h4 style="font-size:13.5px;font-weight:700">➕ Ajouter une question</h4>
+        <form id="quizDraftForm">
+          <label class="a-label">Question</label><input class="a-in" name="texte" required>
+          <label class="a-label">Option 1</label><input class="a-in" name="opt0" required>
+          <label class="a-label">Option 2</label><input class="a-in" name="opt1" required>
+          <label class="a-label">Option 3</label><input class="a-in" name="opt2">
+          <label class="a-label">Option 4</label><input class="a-in" name="opt3">
+          <label class="a-label">Bonne réponse</label>
+          <select class="a-in" name="correct">
+            <option value="0">Option 1</option><option value="1">Option 2</option>
+            <option value="2">Option 3</option><option value="3">Option 4</option>
+          </select>
+          <div style="margin-top:8px"><button class="btn btn-outline btn-sm" type="submit">Ajouter cette question au QCM</button></div>
+        </form>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn btn-ink btn-sm" id="submitQuizBtn" data-matiere="${matiereId}" ${leconQuizDraft.length?'':'disabled'}>Créer le QCM (${leconQuizDraft.length} question${leconQuizDraft.length>1?'s':''})</button>
+      </div>
     </div>`;
 }
 
@@ -2525,29 +2574,72 @@ function tplAdminQuizBuilder(matiereId, lecon){
 function wireAdminMatieres(list){
   const body = document.getElementById('aBody');
   body.querySelectorAll('[data-toggle]').forEach(b=>{
-    b.onclick = ()=>{ openMatiereAdmin = openMatiereAdmin===b.dataset.toggle ? null : b.dataset.toggle; renderAdminMatieres(); };
+    b.onclick = ()=>{
+      openMatiereAdmin = openMatiereAdmin===b.dataset.toggle ? null : b.dataset.toggle;
+      leconFormType = 'video'; leconQuizDraft = [];
+      renderAdminMatieresBody();
+    };
   });
   body.querySelectorAll('[data-del]').forEach(b=>{
     b.onclick = async ()=>{ if(!confirm('Supprimer cette matière et toutes ses leçons ?')) return;
       await deleteDoc(doc(fbDB, C_MATIERES, b.dataset.del)); toast('🗑️ Matière supprimée'); renderAdminMatieres(); };
   });
+  const typeSelect = body.querySelector('#leconTypeSelect');
+  if(typeSelect){
+    typeSelect.onchange = ()=>{ leconFormType = typeSelect.value; leconQuizDraft = []; renderAdminMatieresBody(); };
+  }
+  const quizDraftForm = body.querySelector('#quizDraftForm');
+  if(quizDraftForm){
+    quizDraftForm.addEventListener('submit', ev=>{
+      ev.preventDefault();
+      const fd = new FormData(quizDraftForm);
+      const options = [fd.get('opt0'),fd.get('opt1'),fd.get('opt2'),fd.get('opt3')].map(o=>(o||'').trim()).filter(Boolean);
+      const texte = (fd.get('texte')||'').trim();
+      if(!texte || options.length<2){ toast('⚠️ Renseignez la question et au moins 2 options'); return; }
+      leconQuizDraft.push({ texte, options, correct: parseInt(fd.get('correct'),10)||0 });
+      renderAdminMatieresBody();
+    });
+  }
+  body.querySelectorAll('[data-delquizdraft]').forEach(b=>{
+    b.onclick = ()=>{ leconQuizDraft.splice(parseInt(b.dataset.delquizdraft,10),1); renderAdminMatieresBody(); };
+  });
+  const submitQuizBtn = body.querySelector('#submitQuizBtn');
+  if(submitQuizBtn){
+    submitQuizBtn.onclick = async ()=>{
+      const matiereId = submitQuizBtn.dataset.matiere;
+      const m = list.find(x=>x.id===matiereId);
+      const titreEl = body.querySelector('#quizTitreInput');
+      const titre = (titreEl.value||'').trim();
+      if(!titre){ toast('⚠️ Merci de donner un titre au QCM'); titreEl.focus(); return; }
+      if(!leconQuizDraft.length){ toast('⚠️ Ajoutez au moins une question'); return; }
+      const id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(36).slice(2));
+      const lecon = { id, type:'quiz', titre, url:'', date:null, consignes:'', dateLimite:null,
+        questions: leconQuizDraft, ordre: (m.lecons||[]).length };
+      submitQuizBtn.disabled = true; submitQuizBtn.textContent = 'Création...';
+      try{
+        await updateDoc(doc(fbDB, C_MATIERES, matiereId), { lecons: [...(m.lecons||[]), lecon] });
+        toast('✅ QCM créé'); openMatiereAdmin = matiereId; leconFormType = 'video'; leconQuizDraft = [];
+        renderAdminMatieres();
+      }catch(err){ toast('❌ '+err.message); submitQuizBtn.disabled = false; submitQuizBtn.textContent = 'Créer le QCM'; }
+    };
+  }
   body.querySelectorAll('[data-leconform]').forEach(f=>{
     f.addEventListener('submit', async ev=>{
       ev.preventDefault();
       const matiereId = f.dataset.leconform;
       const m = list.find(x=>x.id===matiereId);
       const fd = new FormData(f);
-      const type = fd.get('type');
+      const type = leconFormType;
       const id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(36).slice(2));
       const lecon = { id, type, titre: fd.get('titre').trim(), url: (fd.get('url')||'').trim(),
         date: fd.get('date') ? new Date(fd.get('date')).getTime() : null,
         consignes: (fd.get('consignes')||'').trim(),
         dateLimite: fd.get('dateLimite') ? new Date(fd.get('dateLimite')).getTime() : null,
         ordre: (m.lecons||[]).length };
-      if(type==='quiz') lecon.questions = [];
       try{
         await updateDoc(doc(fbDB, C_MATIERES, matiereId), { lecons: [...(m.lecons||[]), lecon] });
-        toast('✅ Leçon ajoutée'); openMatiereAdmin = matiereId; renderAdminMatieres();
+        toast('✅ Leçon ajoutée'); openMatiereAdmin = matiereId; leconFormType = 'video';
+        renderAdminMatieres();
       }catch(err){ toast('❌ '+err.message); }
     });
   });
