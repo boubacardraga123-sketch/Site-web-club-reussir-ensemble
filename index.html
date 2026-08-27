@@ -1217,8 +1217,8 @@ function tplCours(){
     <button class="btn btn-outline btn-sm" id="coursLogout">Se déconnecter</button>
   </div>
   <div class="a-row" style="max-width:640px;margin:0 auto 18px;gap:8px">
-    <button class="btn ${coursSubTab==='espace'?'btn-ink':'btn-outline'} btn-sm" data-coursSubTab="espace">Mon espace</button>
-    <button class="btn ${coursSubTab==='matieres'?'btn-ink':'btn-outline'} btn-sm" data-coursSubTab="matieres">Mes matières</button>
+    <button class="btn ${coursSubTab==='espace'?'btn-ink':'btn-outline'} btn-sm" data-cours-sub-tab="espace">Mon espace</button>
+    <button class="btn ${coursSubTab==='matieres'?'btn-ink':'btn-outline'} btn-sm" data-cours-sub-tab="matieres">Mes matières</button>
   </div>
   <div style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
     ${coursSubTab==='espace' ? tplMonEspace() :
@@ -1501,7 +1501,7 @@ function wireCoursBody(){
     return;
   }
   document.getElementById('coursLogout').onclick = ()=> signOut(fbAuth);
-  document.querySelectorAll('[data-coursSubTab]').forEach(b=>{
+  document.querySelectorAll('[data-cours-sub-tab]').forEach(b=>{
     b.onclick = ()=>{ coursSubTab = b.dataset.coursSubTab; renderSiteTab(); };
   });
   document.querySelectorAll('[data-pay]').forEach(b=>{
