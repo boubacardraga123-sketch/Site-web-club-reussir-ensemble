@@ -608,6 +608,7 @@ let mesQuizResultats = [];
 let mesDevoirsSoumissions = [];
 let openQuiz = null;
 let coursAuthMode = 'login';
+let coursSubTab = 'espace';
 let unsubs = [];
 
 const MOTIVATION_QUOTES = [
@@ -1211,13 +1212,96 @@ function tplCours(){
   const nom = currentUser.displayName || currentUser.email;
   return `
   <div class="fiche-head"><div class="tag">Club Réussir Ensemble</div><h2>Cours en ligne</h2></div>
-  <div class="a-row" style="max-width:640px;margin:0 auto 18px;justify-content:space-between;align-items:center">
+  <div class="a-row" style="max-width:640px;margin:0 auto 10px;justify-content:space-between;align-items:center">
     <div class="t2">Connecté(e) en tant que <b>${esc(nom)}</b></div>
     <button class="btn btn-outline btn-sm" id="coursLogout">Se déconnecter</button>
   </div>
+  <div class="a-row" style="max-width:640px;margin:0 auto 18px;gap:8px">
+    <button class="btn ${coursSubTab==='espace'?'btn-ink':'btn-outline'} btn-sm" data-coursSubTab="espace">Mon espace</button>
+    <button class="btn ${coursSubTab==='matieres'?'btn-ink':'btn-outline'} btn-sm" data-coursSubTab="matieres">Mes matières</button>
+  </div>
   <div style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px">
-    ${matieres.length ? matieres.map(m=>tplMatiereCard(m)).join('') : '<div class="empty-note">Aucune matière disponible pour le moment.</div>'}
+    ${coursSubTab==='espace' ? tplMonEspace() :
+      (matieres.length ? matieres.map(m=>tplMatiereCard(m)).join('') : '<div class="empty-note">Aucune matière disponible pour le moment.</div>')}
   </div>`;
+}
+
+function tplMonEspace(){
+  const nom = currentUser.displayName || currentUser.email;
+  const inscritDepuis = currentUser.metadata && currentUser.metadata.creationTime ? new Date(currentUser.metadata.creationTime) : null;
+
+  const accesValides = matieres.filter(m => mesPaiements.some(p=>p.matiereId===m.id && p.statut==='valide'));
+  const accesAttente = matieres.filter(m => {
+    const p = mesPaiements.filter(pp=>pp.matiereId===m.id).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))[0];
+    return p && p.statut==='attente';
+  });
+
+  const nbQuiz = mesQuizResultats.length;
+  const moyenneQuiz = nbQuiz ? Math.round(mesQuizResultats.reduce((s,r)=> s + (r.total? (r.score/r.total*100) : 0), 0) / nbQuiz) : null;
+
+  const nbDevoirs = mesDevoirsSoumissions.length;
+  const devoirsCorriges = mesDevoirsSoumissions.filter(d=>d.statut==='corrige');
+  const devoirsAttente = mesDevoirsSoumissions.filter(d=>d.statut!=='corrige');
+  const moyenneDevoirs = devoirsCorriges.length ? (devoirsCorriges.reduce((s,d)=> s + (Number(d.note)||0), 0) / devoirsCorriges.length) : null;
+
+  const derniersQuiz = mesQuizResultats.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5);
+  const derniersDevoirs = mesDevoirsSoumissions.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5);
+
+  return `
+  <div class="evt-card" style="flex-direction:column;align-items:stretch">
+    <h3>👋 Bonjour ${esc(nom)}</h3>
+    ${inscritDepuis?`<div class="meta">Membre depuis le ${fmtFull(inscritDepuis.getTime())}</div>`:''}
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+    <div class="evt-card" style="flex-direction:column;align-items:center;text-align:center;padding:14px">
+      <div style="font-size:26px;font-weight:800">${accesValides.length}</div>
+      <div class="meta">Matière(s) active(s)${accesAttente.length?` · ${accesAttente.length} en attente`:''}</div>
+    </div>
+    <div class="evt-card" style="flex-direction:column;align-items:center;text-align:center;padding:14px">
+      <div style="font-size:26px;font-weight:800">${nbQuiz}</div>
+      <div class="meta">QCM passé(s)${moyenneQuiz!==null?` · moyenne ${moyenneQuiz}%`:''}</div>
+    </div>
+    <div class="evt-card" style="flex-direction:column;align-items:center;text-align:center;padding:14px">
+      <div style="font-size:26px;font-weight:800">${nbDevoirs}</div>
+      <div class="meta">Devoir(s) rendu(s)${moyenneDevoirs!==null?` · moyenne ${moyenneDevoirs.toFixed(1)}/20`:''}</div>
+    </div>
+    <div class="evt-card" style="flex-direction:column;align-items:center;text-align:center;padding:14px">
+      <div style="font-size:26px;font-weight:800">${devoirsAttente.length}</div>
+      <div class="meta">Devoir(s) en attente de correction</div>
+    </div>
+  </div>
+
+  ${accesValides.length ? `
+  <div class="evt-card" style="flex-direction:column;align-items:stretch">
+    <h3>🎓 Mes matières actives</h3>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+      ${accesValides.map(m=>`<div style="display:flex;justify-content:space-between;align-items:center;font-size:14.5px">
+        <span>${esc(m.nom)}</span><span class="course-badge valide">✅ Actif</span>
+      </div>`).join('')}
+    </div>
+  </div>` : `<div class="empty-note">Vous n'avez encore accès à aucune matière — rendez-vous dans "Mes matières" pour vous inscrire.</div>`}
+
+  ${derniersQuiz.length ? `
+  <div class="evt-card" style="flex-direction:column;align-items:stretch">
+    <h3>📝 Derniers résultats de QCM</h3>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+      ${derniersQuiz.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;font-size:14.5px">
+        <span>${esc(r.matiereNom||'')} — ${esc(r.leconTitre||'')}</span><span><b>${r.score}/${r.total}</b></span>
+      </div>`).join('')}
+    </div>
+  </div>` : ''}
+
+  ${derniersDevoirs.length ? `
+  <div class="evt-card" style="flex-direction:column;align-items:stretch">
+    <h3>📚 Derniers devoirs</h3>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+      ${derniersDevoirs.map(d=>`<div style="display:flex;justify-content:space-between;align-items:center;font-size:14.5px">
+        <span>${esc(d.matiereNom||'')} — ${esc(d.leconTitre||'')}</span>
+        <span>${d.statut==='corrige' ? `<b>${d.note}/20</b>` : '<span class="course-badge attente">⏳</span>'}</span>
+      </div>`).join('')}
+    </div>
+  </div>` : ''}`;
 }
 
 function tplCoursAuth(){
@@ -1417,6 +1501,9 @@ function wireCoursBody(){
     return;
   }
   document.getElementById('coursLogout').onclick = ()=> signOut(fbAuth);
+  document.querySelectorAll('[data-coursSubTab]').forEach(b=>{
+    b.onclick = ()=>{ coursSubTab = b.dataset.coursSubTab; renderSiteTab(); };
+  });
   document.querySelectorAll('[data-pay]').forEach(b=>{
     b.onclick = ()=> openPayModal(b.dataset.pay);
   });
