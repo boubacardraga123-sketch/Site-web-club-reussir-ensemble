@@ -347,6 +347,19 @@ label.a-label{display:block;font-size:13.5px;font-weight:700;color:var(--ink2);m
   .gallery-grid{column-count:1}
   .team-grid{grid-template-columns:repeat(2,1fr)}
 }
+.espace-hero{background:linear-gradient(135deg, var(--red), var(--gold));border-radius:var(--radius);padding:22px 20px;color:#fff;display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.espace-avatar{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:800;font-size:20px;flex-shrink:0}
+.espace-hero .t{font-size:19px;font-weight:800}
+.espace-hero .d{font-size:13.5px;opacity:.9;margin-top:2px}
+.espace-stat{background:var(--paper);border:1.5px solid var(--line);border-radius:var(--radius);padding:16px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.espace-stat .ic{font-size:22px}
+.espace-stat .n{font-size:24px;font-weight:800;line-height:1}
+.espace-stat .l{font-size:12px;color:var(--ink2);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.03em}
+.progress-track{background:var(--paper2);border-radius:20px;height:9px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;background:linear-gradient(90deg, var(--gold), var(--red));border-radius:20px;transition:width .4s ease}
+.espace-matiere{border:1.5px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.espace-matiere .top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14.5px;font-weight:700}
+.espace-matiere .pct{font-family:var(--font-mono);color:var(--gold);font-weight:800}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -1228,6 +1241,7 @@ function tplCours(){
 
 function tplMonEspace(){
   const nom = currentUser.displayName || currentUser.email;
+  const initiales = (currentUser.displayName||currentUser.email||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
   const inscritDepuis = currentUser.metadata && currentUser.metadata.creationTime ? new Date(currentUser.metadata.creationTime) : null;
 
   const accesValides = matieres.filter(m => mesPaiements.some(p=>p.matiereId===m.id && p.statut==='valide'));
@@ -1247,38 +1261,43 @@ function tplMonEspace(){
   const derniersQuiz = mesQuizResultats.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5);
   const derniersDevoirs = mesDevoirsSoumissions.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,5);
 
+  const progressionMatieres = accesValides.map(m=>{
+    const evaluables = (m.lecons||[]).filter(l=>l.type==='quiz'||l.type==='devoir');
+    const done = evaluables.filter(l=> l.type==='quiz'
+      ? mesQuizResultats.some(r=>r.leconId===l.id)
+      : mesDevoirsSoumissions.some(d=>d.leconId===l.id)).length;
+    const pct = evaluables.length ? Math.round(done/evaluables.length*100) : null;
+    return { m, done, total: evaluables.length, pct };
+  });
+
   return `
-  <div class="evt-card" style="flex-direction:column;align-items:stretch">
-    <h3>👋 Bonjour ${esc(nom)}</h3>
-    ${inscritDepuis?`<div class="meta">Membre depuis le ${fmtFull(inscritDepuis.getTime())}</div>`:''}
+  <div class="espace-hero">
+    <div class="espace-avatar">${esc(initiales)}</div>
+    <div>
+      <div class="t">Bonjour ${esc(nom)} 👋</div>
+      ${inscritDepuis?`<div class="d">Membre depuis le ${fmtFull(inscritDepuis.getTime())}</div>`:''}
+    </div>
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
-    <div class="evt-card" style="flex-direction:column;align-items:center;text-align:center;padding:14px">
-      <div style="font-size:26px;font-weight:800">${accesValides.length}</div>
-      <div class="meta">Matière(s) active(s)${accesAttente.length?` · ${accesAttente.length} en attente`:''}</div>
-    </div>
-    <div class="evt-card" style="flex-direction:column;align-items:center;text-align:center;padding:14px">
-      <div style="font-size:26px;font-weight:800">${nbQuiz}</div>
-      <div class="meta">QCM passé(s)${moyenneQuiz!==null?` · moyenne ${moyenneQuiz}%`:''}</div>
-    </div>
-    <div class="evt-card" style="flex-direction:column;align-items:center;text-align:center;padding:14px">
-      <div style="font-size:26px;font-weight:800">${nbDevoirs}</div>
-      <div class="meta">Devoir(s) rendu(s)${moyenneDevoirs!==null?` · moyenne ${moyenneDevoirs.toFixed(1)}/20`:''}</div>
-    </div>
-    <div class="evt-card" style="flex-direction:column;align-items:center;text-align:center;padding:14px">
-      <div style="font-size:26px;font-weight:800">${devoirsAttente.length}</div>
-      <div class="meta">Devoir(s) en attente de correction</div>
-    </div>
+    <div class="espace-stat"><div class="ic">🎓</div><div class="n">${accesValides.length}</div><div class="l">Matière${accesValides.length>1?'s':''} active${accesValides.length>1?'s':''}${accesAttente.length?` (+${accesAttente.length} en attente)`:''}</div></div>
+    <div class="espace-stat"><div class="ic">📝</div><div class="n">${nbQuiz}</div><div class="l">QCM passés${moyenneQuiz!==null?` · ${moyenneQuiz}%`:''}</div></div>
+    <div class="espace-stat"><div class="ic">📚</div><div class="n">${nbDevoirs}</div><div class="l">Devoirs rendus${moyenneDevoirs!==null?` · ${moyenneDevoirs.toFixed(1)}/20`:''}</div></div>
+    <div class="espace-stat"><div class="ic">⏳</div><div class="n">${devoirsAttente.length}</div><div class="l">En attente de correction</div></div>
   </div>
 
-  ${accesValides.length ? `
+  ${progressionMatieres.length ? `
   <div class="evt-card" style="flex-direction:column;align-items:stretch">
-    <h3>🎓 Mes matières actives</h3>
-    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
-      ${accesValides.map(m=>`<div style="display:flex;justify-content:space-between;align-items:center;font-size:14.5px">
-        <span>${esc(m.nom)}</span><span class="course-badge valide">✅ Actif</span>
-      </div>`).join('')}
+    <h3>🎯 Ma progression par matière</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+      ${progressionMatieres.map(({m,done,total,pct})=>`
+        <div class="espace-matiere">
+          <div class="top"><span>${esc(m.nom)}</span>${pct!==null?`<span class="pct">${pct}%</span>`:''}</div>
+          ${pct!==null ? `
+            <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <div style="font-size:12.5px;color:var(--ink2);margin-top:4px">${done}/${total} évaluation${total>1?'s':''} complétée${done>1?'s':''}</div>
+          ` : `<div style="font-size:12.5px;color:var(--ink2);margin-top:4px">Pas encore d'évaluation publiée pour cette matière</div>`}
+        </div>`).join('')}
     </div>
   </div>` : `<div class="empty-note">Vous n'avez encore accès à aucune matière — rendez-vous dans "Mes matières" pour vous inscrire.</div>`}
 
@@ -1743,7 +1762,7 @@ function renderAdminShell(){
   tt.onclick = ()=>{ toggleTheme(); paintTT(); };
 }
 function paintATabs(){
-  const tabs = [['apropos','📝 Vision & valeurs'],['stats','📊 Statistiques'],['couleurs','🎨 Design'],['actus','📰 Actualités'],['evenements','📅 Événements'],['sessions','🗓️ Sessions'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['equipe','👥 Équipe'],['temoignages','💬 Témoignages'],['matieres','🎓 Cours en ligne'],['paiements','💳 Paiements'],['inscriptions','📋 Inscriptions'],['avis','💬 Avis']];
+  const tabs = [['apropos','📝 Vision & valeurs'],['stats','📊 Statistiques'],['couleurs','🎨 Design'],['actus','📰 Actualités'],['evenements','📅 Événements'],['sessions','🗓️ Sessions'],['galerie','🖼️ Galerie'],['videos','🎬 Vidéos'],['equipe','👥 Équipe'],['temoignages','💬 Témoignages'],['matieres','🎓 Cours en ligne'],['eleves','👤 Élèves'],['paiements','💳 Paiements'],['inscriptions','📋 Inscriptions'],['avis','💬 Avis']];
   document.getElementById('aTabs').innerHTML = tabs.map(([k,l])=>`<button class="${adminTab===k?'active':''}" data-t="${k}">${l}</button>`).join('');
   document.getElementById('aTabs').querySelectorAll('button').forEach(b=>{
     b.onclick = ()=>{ adminTab=b.dataset.t; paintATabs(); renderAdminTab(); };
@@ -1766,6 +1785,7 @@ async function renderAdminTab(){
   if(adminTab==='inscriptions') return renderAdminInscriptions();
   if(adminTab==='avis') return renderAdminAvis();
   if(adminTab==='matieres') return renderAdminMatieres();
+  if(adminTab==='eleves') return renderAdminEleves();
   if(adminTab==='paiements') return renderAdminPaiements();
 }
 
@@ -2690,6 +2710,39 @@ function wireAdminMatieres(list){
       }catch(err){ toast('❌ '+err.message); }
     };
   });
+}
+
+/* ── Admin : liste des élèves inscrits (comptes "Cours en ligne") ── */
+async function renderAdminEleves(){
+  const body = document.getElementById('aBody');
+  const [elSnap, paySnap, quizSnap, devSnap] = await Promise.all([
+    getDocs(query(collection(fbDB, 'site_eleves'), orderBy('createdAt','desc'))),
+    getDocs(collection(fbDB, C_PAIEMENTS)),
+    getDocs(collection(fbDB, C_QUIZ_RES)),
+    getDocs(collection(fbDB, C_DEVOIRS)),
+  ]);
+  const eleves = elSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const paiements = paySnap.docs.map(d=>d.data());
+  const quiz = quizSnap.docs.map(d=>d.data());
+  const devoirs = devSnap.docs.map(d=>d.data());
+  body.innerHTML = `
+    <div class="a-card"><h3>👤 Élèves inscrits (${eleves.length})</h3>
+      ${eleves.length ? eleves.map(e=>tplAdminEleveRow(e, paiements, quiz, devoirs)).join('') : '<div class="empty-note">Aucun élève inscrit pour le moment.</div>'}
+    </div>`;
+}
+
+function tplAdminEleveRow(e, paiements, quiz, devoirs){
+  const nbActifs = paiements.filter(p=>p.uid===e.uid && p.statut==='valide').length;
+  const nbQuiz = quiz.filter(r=>r.uid===e.uid).length;
+  const nbDevoirs = devoirs.filter(d=>d.uid===e.uid).length;
+  return `
+    <div class="a-row">
+      <div class="main">
+        <div class="t1">${esc(e.prenom||'')} ${esc(e.nom||'')}</div>
+        <div class="t2">${esc(e.telephone||'—')} · ${esc(e.email||'')}${e.createdAt?' · Inscrit le '+new Date(e.createdAt).toLocaleDateString('fr-FR'):''}</div>
+        <div class="t2">${nbActifs} matière(s) active(s) · ${nbQuiz} QCM · ${nbDevoirs} devoir(s)</div>
+      </div>
+    </div>`;
 }
 
 /* ── Admin : validation des paiements Mobile Money ── */
