@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact — Club Réussir Ensemble</title>
+<title>Mon accompagnement — Club Réussir Ensemble</title>
+<meta name="description" content="Suivi de progression, conseils et objectifs scolaires personnalisés pour les élèves du Club Réussir Ensemble de Mamou.">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Club Réussir Ensemble — styles partagés */
@@ -71,25 +72,42 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
 .kicker{color:var(--red);font-weight:700;font-size:13.5px}
 
 </style>
+
 <style>
-.page-head{background:var(--navy-deep);color:#fff;padding:46px 0}
-.page-head h1{color:#fff;font-size:clamp(26px,4vw,36px)}
-.page-head p{color:#cfd8e3;margin-top:8px;max-width:560px}
+.page-head{background:var(--navy-deep);color:#fff;padding:36px 0}
+.page-head h1{color:#fff;font-size:clamp(24px,3.6vw,32px)}
+.page-head p{color:#cfd8e3;margin-top:6px}
+.logout{color:#cfd8e3;font-size:13px;text-decoration:underline;cursor:pointer;border:none;background:none}
+.dash-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:30px}
+.dash-tabs a{border:1.5px solid var(--line);background:#fff;padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink2)}
+.dash-tabs a.active,.dash-tabs a:hover{background:var(--navy-deep);color:#fff;border-color:var(--navy-deep)}
 
-.contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:32px}
-.info-list{display:flex;flex-direction:column;gap:16px}
-.info-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;display:flex;gap:14px;align-items:flex-start}
-.info-card i{width:40px;height:40px;border-radius:9px;background:var(--paper2);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:18px;flex-shrink:0}
-.info-card b{display:block;font-size:14.5px}
-.info-card span{color:var(--ink2);font-size:13px}
-.info-card a{color:var(--navy)}
+.prog-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:36px}
+.prog-card .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.prog-card .top b{font-family:'Poppins',sans-serif;font-size:15px}
+.prog-card .top span{font-size:13px;color:var(--ink2)}
+.bar{height:10px;border-radius:999px;background:var(--paper2);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:999px;transition:width .4s var(--ease)}
 
-.form-box{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:28px}
-.field{margin-bottom:14px}
-.field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:6px}
-.field input,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;background:var(--paper2)}
-.field textarea{resize:vertical;min-height:110px}
-@media (max-width:800px){.contact-grid{grid-template-columns:1fr}}
+.section-sub{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);margin:30px 0 14px}
+
+.conseil-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:10px}
+.conseil-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.conseil-card i{font-size:22px}
+.conseil-card h3{font-size:14.5px;margin:8px 0 6px}
+.conseil-card p{font-size:13px;color:var(--ink2)}
+
+.goal-form{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.goal-form input{flex:1;min-width:200px;border:1.5px solid var(--line);border-radius:8px;padding:11px 13px;font-size:14px;font-family:inherit;background:var(--paper2)}
+.goal-form input:focus{outline:none;border-color:var(--navy)}
+.goal-list{list-style:none;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.goal-list li{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--paper2);font-size:14px}
+.goal-list li:last-child{border-bottom:none}
+.goal-list li.fait span{text-decoration:line-through;color:var(--ink2)}
+.goal-list input[type=checkbox]{width:18px;height:18px;accent-color:var(--green);flex-shrink:0}
+.goal-list span{flex:1}
+.goal-del{border:none;background:none;color:var(--red);cursor:pointer;font-size:13px;font-weight:700}
+.empty{color:var(--ink2);text-align:center;padding:24px 20px}
 </style>
 </head>
 <body>
@@ -104,47 +122,69 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
       <a href="cours.html">Cours</a>
       <a href="ressources.html">Ressources</a>
       <a href="videos.html">Vidéos</a>
-      <a href="evenements.html">Événements</a>
+      <a href="evenements.html" class="active">Événements</a>
       <a href="apropos.html">À propos</a>
     </nav>
-    <a class="cta" href="suivi.html">Mon espace</a>
+    <a class="cta" href="espace-eleve.html">Mon espace</a>
   </div>
 </header>
 <div class="flag-rule"></div>
 
 <section class="page-head">
-  <div class="wrap">
-    <h1>Nous contacter</h1>
-    <p>Une question sur le club, les cours ou une inscription ? Écris-nous.</p>
+  <div class="wrap" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px">
+    <div>
+      <h1>Mon accompagnement</h1>
+      <p>Ta progression, des conseils pour bien travailler, et tes objectifs scolaires.</p>
+    </div>
+    <button class="logout" id="logoutBtn">Se déconnecter</button>
   </div>
 </section>
 
-<section class="section">
-  <div class="wrap contact-grid">
-    <div class="info-list">
-      <div class="info-card"><i>📍</i><div><b>Adresse</b><span id="adresse">Mamou, Guinée</span></div></div>
-      <div class="info-card"><i>💬</i><div><b>WhatsApp</b><span><a href="https://wa.me/224000000000" id="whatsappLink" target="_blank">Rejoindre le groupe du club</a></span></div></div>
-      <div class="info-card"><i>✉️</i><div><b>E-mail</b><span><a href="mailto:contact@clubreussirensemble-mamou.com" id="emailLink">contact@clubreussirensemble-mamou.com</a></span></div></div>
-      <div class="info-card"><i>🌐</i><div><b>Site</b><span>www.clubreussirensemble-mamou.com</span></div></div>
+<section class="section" style="padding-top:30px">
+  <div class="wrap">
+        <div class="dash-tabs">
+      <a href="espace-eleve.html">Mon espace</a>
+      <a href="evaluations.html">Évaluations</a>
+      <a href="accompagnement.html" class="active">Accompagnement</a>
     </div>
 
-    <div class="form-box" id="formBox">
-      <form id="contactForm">
-        <div class="field"><label>Nom complet</label><input name="nom" required></div>
-        <div class="field"><label>Téléphone ou e-mail</label><input name="contact" required></div>
-        <div class="field"><label>Message</label><textarea name="message" required></textarea></div>
-        <button type="submit" class="btn btn-navy" style="width:100%">Envoyer le message</button>
-        <p id="contactErr" style="color:var(--red);font-size:13px;margin-top:10px"></p>
-      </form>
+    <div class="prog-card">
+      <div class="top"><b>Progression dans tes matières</b><span id="progLabel">—</span></div>
+      <div class="bar"><i id="progBar" style="width:0%"></i></div>
     </div>
+
+    <div class="section-sub">Conseils du Club</div>
+    <div class="conseil-grid" id="conseils"></div>
+
+    <div class="section-sub">Mes objectifs</div>
+    <form class="goal-form" id="goalForm">
+      <input name="texte" type="text" placeholder="Ex. Réviser les suites numériques avant vendredi" required>
+      <button class="btn btn-navy" type="submit">Ajouter</button>
+    </form>
+    <ul class="goal-list" id="goalList"><li class="empty" style="border:none">Connexion en cours…</li></ul>
   </div>
 </section>
 
 <footer class="site-footer">
   <div class="wrap">
-    <div><h4>Club Réussir Ensemble</h4><p>Mamou, Guinée.</p></div>
-    <div><h4>Navigation</h4><ul><li><a href="cours.html">Cours</a></li><li><a href="evenements.html">Événements</a></li><li><a href="inscription.html">Inscription</a></li></ul></div>
-    <div><h4>Devise</h4><p>Rigueur · Discipline · Travail</p></div>
+    <div>
+      <h4>Club Réussir Ensemble</h4>
+      <p>Mamou, Guinée. Un réseau éducatif pour aujourd'hui et pour demain.</p>
+    </div>
+    <div>
+      <h4>Navigation</h4>
+      <ul>
+        <li><a href="cours.html">Cours</a></li>
+        <li><a href="ressources.html">Ressources</a></li>
+        <li><a href="videos.html">Vidéos</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="apropos.html">À propos</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Devise</h4>
+      <p>Rigueur · Discipline · Travail</p>
+    </div>
   </div>
   <div class="foot-bottom">© <span id="y"></span> Club Réussir Ensemble de Mamou.</div>
 </footer>
@@ -154,41 +194,77 @@ document.getElementById('navToggle').onclick=()=>document.getElementById('navLin
 document.getElementById('y').textContent=new Date().getFullYear();
 </script>
 
+<script>
+document.getElementById('conseils').innerHTML = [
+  ['📘','Régularité avant tout','Une heure de révision chaque jour vaut mieux que six heures la veille de l\'examen.'],
+  ['✍️','Refais les anciens sujets','Les annales du Bac sont le meilleur entraînement — chronomètre-toi en conditions réelles.'],
+  ['❓','Pose tes questions','N\'attends pas d\'être bloqué : demande à ton encadreur dès qu\'une notion n\'est pas claire.'],
+  ['🎯','Fixe-toi des objectifs','Un objectif précis et daté avance plus vite qu\'une bonne intention vague.'],
+].map(([icon,titre,texte])=>`<div class="conseil-card"><i>${icon}</i><h3>${titre}</h3><p>${texte}</p></div>`).join('');
+</script>
+
 <script type="module">
-import { fbDB, C_CONTACTS, C_CONFIG, collection, addDoc, doc, getDoc } from "./firebase.js";
+import { fbAuth, fbDB, C_MATIERES, C_PAIEMENTS, C_OBJECTIFS, collection, doc, addDoc,
+         updateDoc, deleteDoc, query, where, onSnapshot, signOut, onAuthStateChanged } from "./firebase.js";
 
-getDoc(doc(fbDB, C_CONFIG, 'apropos')).then(snap=>{
-  if(!snap.exists()) return;
-  const d = snap.data();
-  if(d.adresse) document.getElementById('adresse').textContent = d.adresse;
-  if(d.whatsappLink) document.getElementById('whatsappLink').href = d.whatsappLink;
-  if(d.whatsapp) document.getElementById('whatsappLink').textContent = d.whatsapp;
-  if(d.email){
-    document.getElementById('emailLink').href = 'mailto:' + d.email;
-    document.getElementById('emailLink').textContent = d.email;
-  }
-}).catch(()=>{});
+const goalList = document.getElementById('goalList');
+let matieres = [], paiements = [], objectifs = [], uid = null;
 
-document.getElementById('contactForm').addEventListener('submit', async e=>{
+onAuthStateChanged(fbAuth, user=>{
+  if(!user){ location.href = 'suivi.html'; return; }
+  uid = user.uid;
+
+  onSnapshot(collection(fbDB, C_MATIERES), snap=>{
+    matieres = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    renderProgress();
+  });
+
+  onSnapshot(query(collection(fbDB, C_PAIEMENTS), where('uid','==', uid)), snap=>{
+    paiements = snap.docs.map(d=>d.data());
+    renderProgress();
+  });
+
+  onSnapshot(query(collection(fbDB, C_OBJECTIFS), where('uid','==', uid)), snap=>{
+    objectifs = snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    renderGoals();
+  });
+});
+
+document.getElementById('logoutBtn').onclick = ()=> signOut(fbAuth).then(()=> location.href='index.html');
+
+function renderProgress(){
+  const total = matieres.length;
+  const actives = matieres.filter(m => paiements.some(p=>p.matiereId===m.id && p.statut==='valide')).length;
+  const pct = total ? Math.round((actives/total)*100) : 0;
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = total ? `${actives} sur ${total} matière${total>1?'s':''} active${actives>1?'s':''}` : '—';
+}
+
+document.getElementById('goalForm').addEventListener('submit', async e=>{
   e.preventDefault();
   const fd = new FormData(e.target);
-  const btn = e.target.querySelector('button[type=submit]');
-  btn.disabled = true; btn.textContent = 'Envoi…';
-  const err = document.getElementById('contactErr');
-  try{
-    await addDoc(collection(fbDB, C_CONTACTS), {
-      nom: fd.get('nom').trim(), contact: fd.get('contact').trim(),
-      message: fd.get('message').trim(), createdAt: Date.now(), lu: false
-    });
-    document.getElementById('formBox').innerHTML = `<div style="text-align:center;padding:30px 10px">
-      <h2 style="font-size:18px">Message envoyé ✔</h2>
-      <p style="color:var(--ink2);margin-top:8px">Merci, on te répond très vite.</p>
-    </div>`;
-  }catch(ex){
-    err.textContent = "Une erreur est survenue, réessaie.";
-    btn.disabled = false; btn.textContent = "Envoyer le message";
-  }
+  const texte = fd.get('texte').trim();
+  if(!texte) return;
+  await addDoc(collection(fbDB, C_OBJECTIFS), { uid, texte, fait:false, createdAt: Date.now() });
+  e.target.reset();
 });
+
+function renderGoals(){
+  if(!objectifs.length){ goalList.innerHTML = '<li class="empty" style="border:none">Aucun objectif pour le moment — ajoute le premier ci-dessus.</li>'; return; }
+  goalList.innerHTML = objectifs.map(o=>`
+    <li class="${o.fait?'fait':''}">
+      <input type="checkbox" data-toggle="${o.id}" ${o.fait?'checked':''}>
+      <span>${o.texte}</span>
+      <button class="goal-del" data-del="${o.id}">Supprimer</button>
+    </li>`).join('');
+
+  goalList.querySelectorAll('[data-toggle]').forEach(cb=>{
+    cb.onchange = ()=> updateDoc(doc(fbDB, C_OBJECTIFS, cb.dataset.toggle), { fait: cb.checked });
+  });
+  goalList.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = ()=> deleteDoc(doc(fbDB, C_OBJECTIFS, b.dataset.del));
+  });
+}
 </script>
 </body>
 </html>

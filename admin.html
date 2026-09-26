@@ -88,6 +88,14 @@ body{background:var(--paper2)}
 .row-form label{font-size:11.5px;font-weight:700;color:var(--ink2)}
 .row-form input,.row-form select{padding:9px 11px;border:1.5px solid var(--line);border-radius:7px;font-size:13.5px;font-family:inherit;background:var(--paper2)}
 
+.content-block{border-top:1px solid var(--paper2);padding-top:18px;margin-top:18px}
+.content-block:first-child{border-top:none;padding-top:0;margin-top:0}
+.content-block h3{font-size:14px;margin-bottom:12px;color:var(--navy-deep)}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px}
+.grid-2 .field{display:flex;flex-direction:column;gap:5px}
+.grid-2 label{font-size:11.5px;font-weight:700;color:var(--ink2)}
+.grid-2 input{padding:9px 11px;border:1.5px solid var(--line);border-radius:7px;font-size:13.5px;font-family:inherit;background:var(--paper2)}
+
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{text-align:left;color:var(--ink2);font-size:11.5px;text-transform:uppercase;padding:8px 10px;border-bottom:2px solid var(--line)}
 td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
@@ -132,6 +140,10 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
       <button data-tab="evenements">Événements</button>
       <button data-tab="evaluations">Évaluations</button>
       <button data-tab="objectifs">Objectifs</button>
+      <button data-tab="contenu">Contenu</button>
+      <button data-tab="videos">Vidéos</button>
+      <button data-tab="equipe">Équipe</button>
+      <button data-tab="ressources">Ressources</button>
     </div>
 
     <div id="tab-matieres" class="panel">
@@ -177,7 +189,7 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
         </div>
         <div class="field"><label>Date</label><input name="date" type="date" required></div>
         <div class="field"><label>Heure</label><input name="heure" placeholder="14h00"></div>
-        <div class="field"><label>Lieu</label><input name="lieu" placeholder="École Primaire de Pétel"></div>
+        <div class="field"><label>Lieu</label><input name="lieu" placeholder="Salle du Club, Mamou"></div>
         <div class="field" style="flex:1 1 260px"><label>Description</label><input name="description" placeholder="Courte description"></div>
         <button class="btn btn-navy" type="submit">Ajouter</button>
       </form>
@@ -229,12 +241,144 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
         <tbody id="objectifsBody"><tr><td colspan="3">Chargement…</td></tr></tbody>
       </table>
     </div>
+
+    <div id="tab-contenu" class="panel" style="display:none">
+      <h2>Textes du site public</h2>
+
+      <div class="content-block">
+        <h3>Page d'accueil</h3>
+        <form id="configAccueilForm">
+          <div class="grid-2">
+            <div class="field"><label>Titre (ligne 1)</label><input name="heroTitle1"></div>
+            <div class="field"><label>Titre (ligne 2, en couleur)</label><input name="heroTitle2"></div>
+            <div class="field" style="grid-column:1/-1"><label>Texte sous le titre</label><input name="heroLead"></div>
+            <div class="field"><label>Carte — titre</label><input name="heroCardTitle"></div>
+            <div class="field"><label>Carte — texte</label><input name="heroCardText"></div>
+            <div class="field"><label>Chiffre 1</label><input name="stat1Value"></div>
+            <div class="field"><label>Légende 1</label><input name="stat1Label"></div>
+            <div class="field"><label>Chiffre 2</label><input name="stat2Value"></div>
+            <div class="field"><label>Légende 2</label><input name="stat2Label"></div>
+            <div class="field"><label>Chiffre 3</label><input name="stat3Value"></div>
+            <div class="field"><label>Légende 3</label><input name="stat3Label"></div>
+            <div class="field"><label>Kicker "Pourquoi nous choisir"</label><input name="whyKicker"></div>
+            <div class="field"><label>Titre de la section</label><input name="whyTitle"></div>
+            <div class="field"><label>Carte 1 — titre</label><input name="why1Title"></div>
+            <div class="field"><label>Carte 1 — texte</label><input name="why1Text"></div>
+            <div class="field"><label>Carte 2 — titre</label><input name="why2Title"></div>
+            <div class="field"><label>Carte 2 — texte</label><input name="why2Text"></div>
+            <div class="field"><label>Carte 3 — titre</label><input name="why3Title"></div>
+            <div class="field"><label>Carte 3 — texte</label><input name="why3Text"></div>
+            <div class="field"><label>Bandeau — titre</label><input name="ctaTitle"></div>
+            <div class="field"><label>Bandeau — texte</label><input name="ctaText"></div>
+          </div>
+          <button class="btn btn-navy" type="submit">Enregistrer l'accueil</button>
+        </form>
+      </div>
+
+      <div class="content-block">
+        <h3>Page "À propos"</h3>
+        <form id="configAproposForm">
+          <div class="grid-2">
+            <div class="field"><label>Titre de la page</label><input name="pageTitle"></div>
+            <div class="field"><label>Sous-titre</label><input name="pageSubtitle"></div>
+            <div class="field"><label>Titre "Notre mission"</label><input name="missionTitle"></div>
+            <div class="field" style="grid-column:1/-1"><label>Texte de la mission</label><input name="missionText"></div>
+            <div class="field"><label>Sceau — titre</label><input name="sealTitle"></div>
+            <div class="field"><label>Sceau — sous-titre</label><input name="sealSubtitle"></div>
+            <div class="field"><label>Kicker devise</label><input name="devKicker"></div>
+            <div class="field"><label>Titre devise</label><input name="devTitle"></div>
+            <div class="field"><label>Valeur 1 — titre</label><input name="value1Title"></div>
+            <div class="field"><label>Valeur 1 — texte</label><input name="value1Text"></div>
+            <div class="field"><label>Valeur 2 — titre</label><input name="value2Title"></div>
+            <div class="field"><label>Valeur 2 — texte</label><input name="value2Text"></div>
+            <div class="field"><label>Valeur 3 — titre</label><input name="value3Title"></div>
+            <div class="field"><label>Valeur 3 — texte</label><input name="value3Text"></div>
+            <div class="field"><label>Kicker contact</label><input name="contactKicker"></div>
+            <div class="field"><label>Titre contact</label><input name="contactTitle"></div>
+            <div class="field"><label>Adresse</label><input name="adresse"></div>
+            <div class="field"><label>WhatsApp — texte affiché</label><input name="whatsapp"></div>
+            <div class="field"><label>WhatsApp — lien (wa.me/…)</label><input name="whatsappLink" type="url" placeholder="https://wa.me/224xxxxxxxxx"></div>
+            <div class="field"><label>E-mail</label><input name="email"></div>
+          </div>
+          <button class="btn btn-navy" type="submit">Enregistrer "À propos"</button>
+        </form>
+      </div>
+
+      <div class="content-block">
+        <h3>Page "Vidéos"</h3>
+        <form id="configVideosForm">
+          <div class="grid-2">
+            <div class="field"><label>Titre de la page</label><input name="pageTitle"></div>
+            <div class="field"><label>Sous-titre</label><input name="pageSubtitle"></div>
+            <div class="field"><label>Bandeau direct — titre</label><input name="liveTitle"></div>
+            <div class="field"><label>Bandeau direct — sous-titre</label><input name="liveSubtitle"></div>
+            <div class="field"><label>Bandeau direct — bouton</label><input name="liveBtnText"></div>
+          </div>
+          <button class="btn btn-navy" type="submit">Enregistrer "Vidéos"</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="tab-videos" class="panel" style="display:none">
+      <h2>Ajouter une vidéo</h2>
+      <form id="videoForm" class="row-form">
+        <div class="field"><label>Titre</label><input name="titre" required placeholder="Suites numériques — les bases"></div>
+        <div class="field"><label>Matière</label><input name="matiere" placeholder="Mathématiques"></div>
+        <div class="field"><label>Durée</label><input name="duree" placeholder="12:40"></div>
+        <div class="field"><label>Lien (YouTube, etc.)</label><input name="lien" type="url" placeholder="https://…"></div>
+        <div class="field" style="flex:1 1 260px"><label>Description</label><input name="description" placeholder="Courte description"></div>
+        <button class="btn btn-navy" type="submit">Ajouter</button>
+      </form>
+      <table>
+        <thead><tr><th>Titre</th><th>Matière</th><th>Durée</th><th></th></tr></thead>
+        <tbody id="videosBody"><tr><td colspan="4">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+
+    <div id="tab-equipe" class="panel" style="display:none">
+      <h2>Ajouter un membre de l'équipe</h2>
+      <form id="equipeForm" class="row-form">
+        <div class="field"><label>Nom</label><input name="nom" required placeholder="M. Diallo Boubacar"></div>
+        <div class="field"><label>Rôle</label><input name="role" placeholder="Fondateur, encadreur…"></div>
+        <div class="field"><label>Photo (URL)</label><input name="photoUrl" type="url" placeholder="https://…"></div>
+        <div class="field" style="flex:1 1 260px"><label>Bio courte</label><input name="bio" placeholder="Une phrase de présentation"></div>
+        <button class="btn btn-navy" type="submit">Ajouter</button>
+      </form>
+      <table>
+        <thead><tr><th>Nom</th><th>Rôle</th><th></th></tr></thead>
+        <tbody id="equipeBody"><tr><td colspan="3">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+
+    <div id="tab-ressources" class="panel" style="display:none">
+      <h2>Ajouter une ressource</h2>
+      <form id="ressourceForm" class="row-form">
+        <div class="field"><label>Titre</label><input name="titre" required placeholder="Suites numériques — résumé"></div>
+        <div class="field"><label>Type</label>
+          <select name="type" required>
+            <option value="Fiche de cours">Fiche de cours</option>
+            <option value="Exercices">Exercices</option>
+            <option value="Annale">Annale</option>
+          </select>
+        </div>
+        <div class="field"><label>Matière</label><input name="matiere" placeholder="Mathématiques"></div>
+        <div class="field"><label>Pages</label><input name="pages" type="number" min="0" placeholder="6"></div>
+        <div class="field"><label>Lien (PDF)</label><input name="lien" type="url" placeholder="https://…"></div>
+        <div class="field" style="flex:1 1 260px"><label>Description</label><input name="description" placeholder="Courte description"></div>
+        <button class="btn btn-navy" type="submit">Ajouter</button>
+      </form>
+      <table>
+        <thead><tr><th>Titre</th><th>Type</th><th>Matière</th><th></th></tr></thead>
+        <tbody id="ressourcesBody"><tr><td colspan="4">Chargement…</td></tr></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <script type="module">
 import { fbAuth, fbDB, C_MATIERES, C_PAIEMENTS, C_ELEVES, C_EVENEMENTS, C_EVALUATIONS,
-         C_RESULTATS, C_OBJECTIFS, collection, doc, getDoc, addDoc,
+         C_RESULTATS, C_OBJECTIFS, C_CONFIG, C_VIDEOS, C_EQUIPE, C_RESSOURCES,
+         collection, doc, getDoc, setDoc, addDoc,
          updateDoc, deleteDoc, orderBy, query, onSnapshot, signInWithEmailAndPassword, signOut,
          onAuthStateChanged } from "./firebase.js";
 
@@ -359,6 +503,53 @@ function startListeners(){
     window.__objectifs = snap.docs.map(d=>({id:d.id, ...d.data()}));
     renderObjectifs();
   });
+
+  ['accueil','apropos','videos'].forEach(async docId=>{
+    const snap = await getDoc(doc(fbDB, C_CONFIG, docId));
+    if(!snap.exists()) return;
+    const form = document.getElementById('config'+docId.charAt(0).toUpperCase()+docId.slice(1)+'Form');
+    const data = snap.data();
+    Object.keys(data).forEach(k=>{
+      const input = form.elements.namedItem(k);
+      if(input) input.value = data[k];
+    });
+  });
+
+  onSnapshot(query(collection(fbDB, C_VIDEOS), orderBy('ordre','asc')), snap=>{
+    const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    document.getElementById('videosBody').innerHTML = rows.length ? rows.map(v=>
+      `<tr><td>${v.titre||''}</td><td>${v.matiere||'—'}</td><td>${v.duree||'—'}</td>
+       <td><button class="small-btn" data-delvid="${v.id}" style="background:var(--red)">Supprimer</button></td></tr>`
+    ).join('') : '<tr><td colspan="4">Aucune vidéo.</td></tr>';
+
+    document.querySelectorAll('[data-delvid]').forEach(b=>{
+      b.onclick = ()=> { if(confirm('Supprimer cette vidéo ?')) deleteDoc(doc(fbDB, C_VIDEOS, b.dataset.delvid)); };
+    });
+  });
+
+  onSnapshot(query(collection(fbDB, C_EQUIPE), orderBy('ordre','asc')), snap=>{
+    const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    document.getElementById('equipeBody').innerHTML = rows.length ? rows.map(m=>
+      `<tr><td>${m.nom||''}</td><td>${m.role||'—'}</td>
+       <td><button class="small-btn" data-delmem="${m.id}" style="background:var(--red)">Supprimer</button></td></tr>`
+    ).join('') : '<tr><td colspan="3">Aucun membre.</td></tr>';
+
+    document.querySelectorAll('[data-delmem]').forEach(b=>{
+      b.onclick = ()=> { if(confirm('Supprimer ce membre ?')) deleteDoc(doc(fbDB, C_EQUIPE, b.dataset.delmem)); };
+    });
+  });
+
+  onSnapshot(query(collection(fbDB, C_RESSOURCES), orderBy('ordre','asc')), snap=>{
+    const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    document.getElementById('ressourcesBody').innerHTML = rows.length ? rows.map(r=>
+      `<tr><td>${r.titre||''}</td><td>${r.type||'—'}</td><td>${r.matiere||'—'}</td>
+       <td><button class="small-btn" data-delres="${r.id}" style="background:var(--red)">Supprimer</button></td></tr>`
+    ).join('') : '<tr><td colspan="4">Aucune ressource.</td></tr>';
+
+    document.querySelectorAll('[data-delres]').forEach(b=>{
+      b.onclick = ()=> { if(confirm('Supprimer cette ressource ?')) deleteDoc(doc(fbDB, C_RESSOURCES, b.dataset.delres)); };
+    });
+  });
 }
 
 function nomEleve(uid){
@@ -433,6 +624,67 @@ document.getElementById('resultatForm').addEventListener('submit', async e=>{
     evaluationId: fd.get('evaluationId'),
     note: Number(fd.get('note')),
     date: Date.now()
+  });
+  e.target.reset();
+});
+
+function formToObject(form){
+  const fd = new FormData(form);
+  const o = {};
+  for(const [k,v] of fd.entries()) o[k] = v.trim();
+  return o;
+}
+
+['configAccueilForm','configAproposForm','configVideosForm'].forEach(id=>{
+  document.getElementById(id).addEventListener('submit', async e=>{
+    e.preventDefault();
+    const docId = id.replace('config','').replace('Form','').toLowerCase();
+    await setDoc(doc(fbDB, C_CONFIG, docId), formToObject(e.target), { merge: true });
+    alert('Enregistré ✔');
+  });
+});
+
+document.getElementById('videoForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  await addDoc(collection(fbDB, C_VIDEOS), {
+    titre: fd.get('titre').trim(),
+    matiere: (fd.get('matiere')||'').trim(),
+    duree: (fd.get('duree')||'').trim(),
+    lien: (fd.get('lien')||'').trim(),
+    description: (fd.get('description')||'').trim(),
+    ordre: Date.now(),
+    createdAt: Date.now()
+  });
+  e.target.reset();
+});
+
+document.getElementById('equipeForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  await addDoc(collection(fbDB, C_EQUIPE), {
+    nom: fd.get('nom').trim(),
+    role: (fd.get('role')||'').trim(),
+    photoUrl: (fd.get('photoUrl')||'').trim(),
+    bio: (fd.get('bio')||'').trim(),
+    ordre: Date.now(),
+    createdAt: Date.now()
+  });
+  e.target.reset();
+});
+
+document.getElementById('ressourceForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  await addDoc(collection(fbDB, C_RESSOURCES), {
+    titre: fd.get('titre').trim(),
+    type: fd.get('type'),
+    matiere: (fd.get('matiere')||'').trim(),
+    pages: Number(fd.get('pages'))||0,
+    lien: (fd.get('lien')||'').trim(),
+    description: (fd.get('description')||'').trim(),
+    ordre: Date.now(),
+    createdAt: Date.now()
   });
   e.target.reset();
 });
