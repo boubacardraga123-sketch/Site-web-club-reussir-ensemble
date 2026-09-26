@@ -140,8 +140,16 @@ form.active{display:block}
         <div class="field"><label>Classe</label>
           <select name="classe" required>
             <option value="">Choisir…</option>
-            <option>Terminale SM</option>
-            <option>Terminale SE</option>
+            <optgroup label="Primaire">
+              <option>CP1</option><option>CP2</option><option>CE1</option><option>CE2</option><option>CM1</option><option>CM2</option>
+            </optgroup>
+            <optgroup label="Collège">
+              <option>7e année</option><option>8e année</option><option>9e année</option><option>10e année</option>
+            </optgroup>
+            <optgroup label="Lycée">
+              <option>11e année</option><option>12e année</option><option>Terminale SM</option><option>Terminale SE</option><option>Terminale SS</option>
+            </optgroup>
+            <option>Autre</option>
           </select>
         </div>
         <div class="field"><label>Mot de passe</label><input name="password" type="password" placeholder="6 caractères minimum" required minlength="6"></div>
@@ -156,7 +164,7 @@ form.active{display:block}
   <div class="wrap">
     <div>
       <h4>Club Réussir Ensemble</h4>
-      <p>École Primaire de Pétel, Mamou, Guinée. Un réseau éducatif pour aujourd'hui et pour demain.</p>
+      <p>Mamou, Guinée. Un réseau éducatif pour aujourd'hui et pour demain.</p>
     </div>
     <div>
       <h4>Navigation</h4>

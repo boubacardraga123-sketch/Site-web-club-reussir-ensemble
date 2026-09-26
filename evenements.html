@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inscription — Club Réussir Ensemble</title>
+<title>Événements — Club Réussir Ensemble</title>
+<meta name="description" content="Concours, conférences et activités du Club Réussir Ensemble de Mamou : calendrier des événements à venir et passés.">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Club Réussir Ensemble — styles partagés */
@@ -71,20 +72,30 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
 .kicker{color:var(--red);font-weight:700;font-size:13.5px}
 
 </style>
+
 <style>
 .page-head{background:var(--navy-deep);color:#fff;padding:46px 0}
 .page-head h1{color:#fff;font-size:clamp(26px,4vw,36px)}
 .page-head p{color:#cfd8e3;margin-top:8px;max-width:560px}
 
-.form-box{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:32px;max-width:640px;margin:0 auto}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.field{margin-bottom:14px}
-.field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:6px}
-.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;background:var(--paper2)}
-.field textarea{resize:vertical;min-height:80px}
-.confirm{text-align:center;padding:40px 20px}
-.confirm .stamp{width:70px;height:70px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 18px}
-@media (max-width:600px){.grid2{grid-template-columns:1fr}}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:28px 0}
+.filters button{border:1.5px solid var(--line);background:#fff;padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .2s var(--ease)}
+.filters button.active,.filters button:hover{background:var(--navy-deep);color:#fff;border-color:var(--navy-deep)}
+
+.evt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.evt-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;gap:16px;padding:20px}
+.evt-date{flex-shrink:0;width:62px;height:62px;border-radius:10px;background:var(--paper2);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Poppins',sans-serif}
+.evt-date b{font-size:22px;line-height:1;color:var(--navy-deep)}
+.evt-date span{font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--red);letter-spacing:.03em}
+.evt-body{flex:1;min-width:0}
+.evt-type{display:inline-flex;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:#e7f6ec;color:var(--green);margin-bottom:8px}
+.evt-type.conference{background:#eaf0fb;color:var(--navy)}
+.evt-type.concours{background:#fdeaea;color:var(--red)}
+.evt-body h3{font-size:16px;margin-bottom:4px}
+.evt-body p{color:var(--ink2);font-size:13.5px;margin-bottom:8px}
+.evt-meta{font-size:12.5px;color:var(--ink2);display:flex;gap:12px;flex-wrap:wrap}
+.evt-card.passe{opacity:.6}
+.empty{color:var(--ink2);text-align:center;padding:40px 20px}
 </style>
 </head>
 <body>
@@ -99,7 +110,7 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
       <a href="cours.html">Cours</a>
       <a href="ressources.html">Ressources</a>
       <a href="videos.html">Vidéos</a>
-      <a href="evenements.html">Événements</a>
+      <a href="evenements.html" class="active">Événements</a>
       <a href="apropos.html">À propos</a>
     </nav>
     <a class="cta" href="suivi.html">Mon espace</a>
@@ -109,54 +120,46 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
 
 <section class="page-head">
   <div class="wrap">
-    <h1>Rejoindre le club</h1>
-    <p>Inscris-toi au Club Réussir Ensemble de Mamou. Un formateur te contactera sur WhatsApp pour la suite.</p>
+    <h1>Événements</h1>
+    <p>Concours, conférences et activités du Club Réussir Ensemble de Mamou. Retrouve ici le calendrier de tout ce qui se passe au Club.</p>
   </div>
 </section>
 
-<section class="section">
+<section class="section" style="padding-top:0">
   <div class="wrap">
-    <div class="form-box" id="formBox">
-      <form id="inscForm">
-        <div class="grid2">
-          <div class="field"><label>Prénom</label><input name="prenom" required></div>
-          <div class="field"><label>Nom</label><input name="nom" required></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>Téléphone (WhatsApp)</label><input name="telephone" type="tel" required></div>
-          <div class="field"><label>E-mail (optionnel)</label><input name="email" type="email"></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>Classe</label>
-            <select name="classe" required>
-              <option value="">Choisir…</option>
-              <optgroup label="Primaire">
-                <option>CP1</option><option>CP2</option><option>CE1</option><option>CE2</option><option>CM1</option><option>CM2</option>
-              </optgroup>
-              <optgroup label="Collège">
-                <option>7e année</option><option>8e année</option><option>9e année</option><option>10e année</option>
-              </optgroup>
-              <optgroup label="Lycée">
-                <option>11e année</option><option>12e année</option><option>Terminale SM</option><option>Terminale SE</option><option>Terminale SS</option>
-              </optgroup>
-              <option>Autre</option>
-            </select>
-          </div>
-          <div class="field"><label>Filière</label><input name="filiere" placeholder="Ex : Sciences Expérimentales"></div>
-        </div>
-        <div class="field"><label>Message (optionnel)</label><textarea name="message" placeholder="Une question, une attente particulière…"></textarea></div>
-        <button type="submit" class="btn btn-gold" style="width:100%">Envoyer ma fiche d'inscription</button>
-        <p id="inscErr" style="color:var(--red);font-size:13px;margin-top:10px"></p>
-      </form>
+    <div class="filters" id="filters">
+      <button class="active" data-f="toutes">Toutes</button>
+      <button data-f="concours">Concours</button>
+      <button data-f="conference">Conférences</button>
+      <button data-f="activite">Activités</button>
+    </div>
+
+    <div class="evt-grid" id="grid">
+      <p class="empty">Chargement des événements…</p>
     </div>
   </div>
 </section>
 
 <footer class="site-footer">
   <div class="wrap">
-    <div><h4>Club Réussir Ensemble</h4><p>Mamou, Guinée.</p></div>
-    <div><h4>Navigation</h4><ul><li><a href="cours.html">Cours</a></li><li><a href="evenements.html">Événements</a></li><li><a href="contact.html">Contact</a></li></ul></div>
-    <div><h4>Devise</h4><p>Rigueur · Discipline · Travail</p></div>
+    <div>
+      <h4>Club Réussir Ensemble</h4>
+      <p>Mamou, Guinée. Un réseau éducatif pour aujourd'hui et pour demain.</p>
+    </div>
+    <div>
+      <h4>Navigation</h4>
+      <ul>
+        <li><a href="cours.html">Cours</a></li>
+        <li><a href="ressources.html">Ressources</a></li>
+        <li><a href="videos.html">Vidéos</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="apropos.html">À propos</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Devise</h4>
+      <p>Rigueur · Discipline · Travail</p>
+    </div>
   </div>
   <div class="foot-bottom">© <span id="y"></span> Club Réussir Ensemble de Mamou.</div>
 </footer>
@@ -167,34 +170,50 @@ document.getElementById('y').textContent=new Date().getFullYear();
 </script>
 
 <script type="module">
-import { fbDB, C_INSC, collection, addDoc } from "./firebase.js";
+import { fbDB, C_EVENEMENTS, collection, orderBy, query, onSnapshot } from "./firebase.js";
 
-document.getElementById('inscForm').addEventListener('submit', async e=>{
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  const btn = e.target.querySelector('button[type=submit]');
-  btn.disabled = true; btn.textContent = 'Envoi…';
-  const err = document.getElementById('inscErr');
-  try{
-    const data = {
-      prenom: fd.get('prenom').trim(), nom: fd.get('nom').trim(),
-      telephone: fd.get('telephone').trim(), email: (fd.get('email')||'').trim(),
-      classe: fd.get('classe'), filiere: (fd.get('filiere')||'').trim(),
-      message: (fd.get('message')||'').trim(),
-      statut: 'nouveau', decision: 'en_attente', dateInscription: Date.now()
-    };
-    await addDoc(collection(fbDB, C_INSC), data);
-    document.getElementById('formBox').innerHTML = `<div class="confirm">
-      <div class="stamp">✔</div>
-      <h2>Merci, ${data.prenom} !</h2>
-      <p style="color:var(--ink2);margin-top:8px">Ta fiche d'inscription a bien été reçue. Un formateur du club te contactera bientôt sur WhatsApp.</p>
-      <a class="btn btn-navy" href="index.html" style="margin-top:20px">Retour à l'accueil</a>
-    </div>`;
-  }catch(ex){
-    err.textContent = "Une erreur est survenue, réessaie.";
-    btn.disabled = false; btn.textContent = "Envoyer ma fiche d'inscription";
-  }
+const grid = document.getElementById('grid');
+const moisAbbr = ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛT','SEPT','OCT','NOV','DÉC'];
+const typeLabels = { concours:'Concours', conference:'Conférence', activite:'Activité' };
+let evenements = [];
+let filtre = 'toutes';
+
+onSnapshot(query(collection(fbDB, C_EVENEMENTS), orderBy('date','asc')), snap=>{
+  evenements = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  render();
 });
+
+document.getElementById('filters').addEventListener('click', e=>{
+  if(e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#filters button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  filtre = e.target.dataset.f;
+  render();
+});
+
+function render(){
+  const today = new Date().toISOString().slice(0,10);
+  const list = evenements.filter(e => filtre==='toutes' || e.type===filtre);
+  if(!list.length){
+    grid.innerHTML = evenements.length ? '<p class="empty">Aucun événement dans cette catégorie.</p>' : '<p class="empty">Aucun événement publié pour le moment — reviens bientôt !</p>';
+    return;
+  }
+  grid.innerHTML = list.map(e=>{
+    const d = e.date ? new Date(e.date+'T00:00:00') : null;
+    const jour = d ? d.getDate() : '--';
+    const mois = d ? moisAbbr[d.getMonth()] : '';
+    const passe = e.date && e.date < today;
+    return `<div class="evt-card ${passe?'passe':''}">
+      <div class="evt-date"><b>${jour}</b><span>${mois}</span></div>
+      <div class="evt-body">
+        <span class="evt-type ${e.type||''}">${typeLabels[e.type] || 'Activité'}${passe?' · Terminé':''}</span>
+        <h3>${e.titre||'Sans titre'}</h3>
+        <p>${e.description||''}</p>
+        <div class="evt-meta">${e.lieu?`<span>📍 ${e.lieu}</span>`:''}${e.heure?`<span>🕒 ${e.heure}</span>`:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
 </script>
 </body>
 </html>
