@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Administration — Club Réussir Ensemble</title>
+<link rel="manifest" href="manifest-admin.json">
+<meta name="theme-color" content="#0A2A57">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CRE Admin">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Club Réussir Ensemble — styles partagés */
@@ -129,6 +137,7 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
     <div class="wrap row">
       <h1>Administration — Club Réussir Ensemble</h1>
       <a class="admin-link" href="index.html">Voir le site</a>
+      <button class="admin-link" id="installBtn" style="display:none;border:none;cursor:pointer;font:inherit">📲 Installer l'application</button>
       <a class="admin-link" href="#" id="logoutLink">Déconnexion</a>
     </div>
   </div>
@@ -688,6 +697,27 @@ document.getElementById('ressourceForm').addEventListener('submit', async e=>{
   });
   e.target.reset();
 });
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw-admin.js').catch(()=>{});
+}
+let deferredInstall = null;
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  deferredInstall = e;
+  installBtn.style.display = 'inline-block';
+});
+installBtn.addEventListener('click', async ()=>{
+  if(!deferredInstall) return;
+  deferredInstall.prompt();
+  await deferredInstall.userChoice;
+  deferredInstall = null;
+  installBtn.style.display = 'none';
+});
+window.addEventListener('appinstalled', ()=>{ installBtn.style.display = 'none'; });
 </script>
 </body>
 </html>
