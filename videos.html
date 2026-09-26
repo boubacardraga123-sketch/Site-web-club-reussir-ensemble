@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vidéos — Club Réussir Ensemble</title>
-<meta name="description" content="Vidéos tutorielles et cours en direct pour les élèves de Terminale SM/SE à Mamou.">
+<meta name="description" content="Vidéos tutorielles et cours en direct pour les élèves de toutes les classes à Mamou.">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Club Réussir Ensemble — styles partagés */
@@ -119,51 +119,24 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
 
 <section class="page-head">
   <div class="wrap">
-    <h1>Vidéos & cours en direct</h1>
-    <p>Explications pas à pas et sessions en direct animées par les encadreurs du club.</p>
+    <h1 id="pageTitle">Vidéos & cours en direct</h1>
+    <p id="pageSubtitle">Explications pas à pas et sessions en direct animées par les encadreurs du club.</p>
   </div>
 </section>
 
 <section class="section" style="padding-top:0">
   <div class="wrap">
     <div class="live-band">
-      <div><span class="dot"></span><b>Prochain direct : Physique — Mécanique</b><div style="opacity:.9;font-size:13px;margin-top:4px">Samedi, 15h00 · Sur WhatsApp</div></div>
-      <a class="btn btn-gold" href="apropos.html">Rejoindre le groupe</a>
+      <div><span class="dot"></span><b id="liveTitle">Prochain direct : Physique — Mécanique</b><div style="opacity:.9;font-size:13px;margin-top:4px" id="liveSubtitle">Samedi, 15h00 · Sur WhatsApp</div></div>
+      <a class="btn btn-gold" href="apropos.html" id="liveBtnText">Rejoindre le groupe</a>
     </div>
 
-    <div class="subj-nav">
+    <div class="subj-nav" id="filters">
       <button class="active" data-f="toutes">Toutes</button>
-      <button data-f="maths">Mathématiques</button>
-      <button data-f="physique">Physique</button>
-      <button data-f="chimie">Chimie</button>
-      <button data-f="svt">SVT</button>
     </div>
 
     <div class="video-grid" id="grid">
-      <div class="video-card" data-cat="maths">
-        <div class="thumb"><div class="play">▶</div><span class="dur">12:40</span></div>
-        <div class="body"><div class="subj">MATHÉMATIQUES</div><h3>Suites numériques — les bases</h3><p>Comprendre les suites arithmétiques et géométriques.</p></div>
-      </div>
-      <div class="video-card" data-cat="physique">
-        <div class="thumb"><div class="play">▶</div><span class="dur">18:05</span></div>
-        <div class="body"><div class="subj">PHYSIQUE</div><h3>Mécanique du point — méthode</h3><p>Résoudre un exercice de cinématique étape par étape.</p></div>
-      </div>
-      <div class="video-card" data-cat="chimie">
-        <div class="thumb"><div class="play">▶</div><span class="dur">09:22</span></div>
-        <div class="body"><div class="subj">CHIMIE</div><h3>Oxydoréduction expliquée</h3><p>Équilibrer une réaction rédox rapidement.</p></div>
-      </div>
-      <div class="video-card" data-cat="svt">
-        <div class="thumb"><div class="play">▶</div><span class="dur">14:10</span></div>
-        <div class="body"><div class="subj">SVT</div><h3>Le système nerveux</h3><p>Schéma et fonctionnement, prêt pour le Bac.</p></div>
-      </div>
-      <div class="video-card" data-cat="maths">
-        <div class="thumb"><div class="play">▶</div><span class="dur">16:30</span></div>
-        <div class="body"><div class="subj">MATHÉMATIQUES</div><h3>Probabilités — exercices types</h3><p>Trois sujets de Bac corrigés en direct.</p></div>
-      </div>
-      <div class="video-card" data-cat="physique">
-        <div class="thumb"><div class="play">▶</div><span class="dur">11:15</span></div>
-        <div class="body"><div class="subj">PHYSIQUE</div><h3>Électricité — circuits de base</h3><p>Loi d'Ohm et lois des mailles, avec exemples.</p></div>
-      </div>
+      <p style="color:var(--ink2)">Chargement des vidéos…</p>
     </div>
   </div>
 </section>
@@ -172,7 +145,7 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
   <div class="wrap">
     <div>
       <h4>Club Réussir Ensemble</h4>
-      <p>École Primaire de Pétel, Mamou, Guinée. Un réseau éducatif pour aujourd'hui et pour demain.</p>
+      <p>Mamou, Guinée. Un réseau éducatif pour aujourd'hui et pour demain.</p>
     </div>
     <div>
       <h4>Navigation</h4>
@@ -192,19 +165,55 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
   <div class="foot-bottom">© <span id="y"></span> Club Réussir Ensemble de Mamou.</div>
 </footer>
 
-<script>
+<script type="module">
+import { fbDB, C_CONFIG, C_VIDEOS, doc, getDoc, collection, query, orderBy, onSnapshot } from "./firebase.js";
+
 document.getElementById('navToggle').onclick=()=>document.getElementById('navLinks').classList.toggle('open');
 document.getElementById('y').textContent=new Date().getFullYear();
-document.querySelectorAll('.subj-nav button').forEach(b=>{
-  b.onclick=()=>{
-    document.querySelectorAll('.subj-nav button').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    const f=b.dataset.f;
-    document.querySelectorAll('.video-card').forEach(c=>{
-      c.style.display=(f==='toutes'||c.dataset.cat===f)?'':'none';
-    });
-  };
+
+getDoc(doc(fbDB, C_CONFIG, 'videos')).then(snap=>{
+  if(!snap.exists()) return;
+  const d = snap.data();
+  const set = (id, val) => { if(val !== undefined && val !== '') document.getElementById(id).textContent = val; };
+  set('pageTitle', d.pageTitle); set('pageSubtitle', d.pageSubtitle);
+  set('liveTitle', d.liveTitle); set('liveSubtitle', d.liveSubtitle); set('liveBtnText', d.liveBtnText);
+}).catch(()=>{});
+
+const grid = document.getElementById('grid');
+const filters = document.getElementById('filters');
+let videos = [];
+let filtre = 'toutes';
+
+onSnapshot(query(collection(fbDB, C_VIDEOS), orderBy('ordre','asc')), snap=>{
+  videos = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  renderFilters();
+  render();
 });
+
+function renderFilters(){
+  const matieres = [...new Set(videos.map(v=>v.matiere).filter(Boolean))];
+  filters.innerHTML = ['<button data-f="toutes" class="'+(filtre==='toutes'?'active':'')+'">Toutes</button>']
+    .concat(matieres.map(m=>`<button data-f="${m}" class="${filtre===m?'active':''}">${m}</button>`)).join('');
+  filters.querySelectorAll('button').forEach(b=>{
+    b.onclick = ()=>{ filtre = b.dataset.f; renderFilters(); render(); };
+  });
+}
+
+function render(){
+  const list = videos.filter(v => filtre==='toutes' || v.matiere===filtre);
+  if(!list.length){
+    grid.innerHTML = videos.length ? '<p style="color:var(--ink2)">Aucune vidéo dans cette matière.</p>' : '<p style="color:var(--ink2)">Aucune vidéo publiée pour le moment.</p>';
+    return;
+  }
+  grid.innerHTML = list.map(v=>{
+    const card = `
+      <div class="thumb"><div class="play">▶</div>${v.duree?`<span class="dur">${v.duree}</span>`:''}</div>
+      <div class="body"><div class="subj">${(v.matiere||'').toUpperCase()}</div><h3>${v.titre||''}</h3><p>${v.description||''}</p></div>`;
+    return v.lien
+      ? `<a class="video-card" href="${v.lien}" target="_blank" rel="noopener" style="display:block">${card}</a>`
+      : `<div class="video-card">${card}</div>`;
+  }).join('');
+}
 </script>
 </body>
 </html>

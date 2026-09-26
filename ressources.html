@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ressources — Club Réussir Ensemble</title>
-<meta name="description" content="Fiches, exercices et annales de la Collection BHDS pour les élèves de Terminale SM/SE à Mamou.">
+<meta name="description" content="Fiches, exercices et annales de la Collection BHDS pour les élèves de toutes les classes à Mamou.">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Club Réussir Ensemble — styles partagés */
@@ -112,61 +112,23 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
   </div>
 </header>
 <div class="flag-rule"></div>
-<div class="bhds-strip">COLLECTION BHDS — Fiches conçues par le Club Réussir Ensemble</div>
+<div class="bhds-strip" id="bhdsStrip">COLLECTION BHDS — Fiches conçues par le Club Réussir Ensemble</div>
 
 <section class="page-head">
   <div class="wrap">
-    <h1>Ressources pédagogiques</h1>
-    <p>Fiches de cours, exercices corrigés et annales du Bac, tirés de la Collection BHDS et organisés par matière.</p>
+    <h1 id="pageTitle">Ressources pédagogiques</h1>
+    <p id="pageSubtitle">Fiches de cours, exercices corrigés et annales du Bac, tirés de la Collection BHDS et organisés par matière.</p>
   </div>
 </section>
 
 <section class="section" style="padding-top:0">
   <div class="wrap">
-    <div class="subj-nav">
+    <div class="subj-nav" id="filters">
       <button class="active" data-f="toutes">Toutes</button>
-      <button data-f="maths">Mathématiques</button>
-      <button data-f="physique">Physique</button>
-      <button data-f="chimie">Chimie</button>
     </div>
 
     <div class="res-grid" id="grid">
-      <div class="res-card" data-cat="maths">
-        <span class="type">Fiche de cours</span>
-        <h3>Suites numériques — résumé</h3>
-        <p>Définitions, propriétés et méthodes essentielles, avec exemples résolus.</p>
-        <div class="foot"><span>PDF · 6 pages</span><span class="dl">Télécharger ↓</span></div>
-      </div>
-      <div class="res-card" data-cat="physique">
-        <span class="type">Exercices</span>
-        <h3>Mécanique du point — série</h3>
-        <p>20 exercices progressifs avec corrections détaillées.</p>
-        <div class="foot"><span>PDF · 10 pages</span><span class="dl">Télécharger ↓</span></div>
-      </div>
-      <div class="res-card" data-cat="chimie">
-        <span class="type">Annale</span>
-        <h3>Bac blanc — Chimie 2025</h3>
-        <p>Sujet complet et corrigé type, conditions réelles d'examen.</p>
-        <div class="foot"><span>PDF · 4 pages</span><span class="dl">Télécharger ↓</span></div>
-      </div>
-      <div class="res-card" data-cat="maths">
-        <span class="type">Exercices</span>
-        <h3>Probabilités — série</h3>
-        <p>Exercices types Bac avec barème et méthode de rédaction.</p>
-        <div class="foot"><span>PDF · 5 pages</span><span class="dl">Télécharger ↓</span></div>
-      </div>
-      <div class="res-card" data-cat="physique">
-        <span class="type">Fiche de cours</span>
-        <h3>Électricité — formulaire</h3>
-        <p>Toutes les formules et lois essentielles sur une seule fiche.</p>
-        <div class="foot"><span>PDF · 2 pages</span><span class="dl">Télécharger ↓</span></div>
-      </div>
-      <div class="res-card" data-cat="chimie">
-        <span class="type">Fiche de cours</span>
-        <h3>Oxydoréduction — résumé</h3>
-        <p>Notions clés, équations types et pièges à éviter.</p>
-        <div class="foot"><span>PDF · 3 pages</span><span class="dl">Télécharger ↓</span></div>
-      </div>
+      <p style="color:var(--ink2)">Chargement des ressources…</p>
     </div>
   </div>
 </section>
@@ -175,7 +137,7 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
   <div class="wrap">
     <div>
       <h4>Club Réussir Ensemble</h4>
-      <p>École Primaire de Pétel, Mamou, Guinée. Un réseau éducatif pour aujourd'hui et pour demain.</p>
+      <p>Mamou, Guinée. Un réseau éducatif pour aujourd'hui et pour demain.</p>
     </div>
     <div>
       <h4>Navigation</h4>
@@ -195,19 +157,46 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
   <div class="foot-bottom">© <span id="y"></span> Club Réussir Ensemble de Mamou.</div>
 </footer>
 
-<script>
+<script type="module">
+import { fbDB, C_RESSOURCES, collection, query, orderBy, onSnapshot } from "./firebase.js";
+
 document.getElementById('navToggle').onclick=()=>document.getElementById('navLinks').classList.toggle('open');
 document.getElementById('y').textContent=new Date().getFullYear();
-document.querySelectorAll('.subj-nav button').forEach(b=>{
-  b.onclick=()=>{
-    document.querySelectorAll('.subj-nav button').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    const f=b.dataset.f;
-    document.querySelectorAll('.res-card').forEach(c=>{
-      c.style.display=(f==='toutes'||c.dataset.cat===f)?'':'none';
-    });
-  };
+
+const grid = document.getElementById('grid');
+const filters = document.getElementById('filters');
+let ressources = [];
+let filtre = 'toutes';
+
+onSnapshot(query(collection(fbDB, C_RESSOURCES), orderBy('ordre','asc')), snap=>{
+  ressources = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  renderFilters();
+  render();
 });
+
+function renderFilters(){
+  const matieres = [...new Set(ressources.map(r=>r.matiere).filter(Boolean))];
+  filters.innerHTML = ['<button data-f="toutes" class="'+(filtre==='toutes'?'active':'')+'">Toutes</button>']
+    .concat(matieres.map(m=>`<button data-f="${m}" class="${filtre===m?'active':''}">${m}</button>`)).join('');
+  filters.querySelectorAll('button').forEach(b=>{
+    b.onclick = ()=>{ filtre = b.dataset.f; renderFilters(); render(); };
+  });
+}
+
+function render(){
+  const list = ressources.filter(r => filtre==='toutes' || r.matiere===filtre);
+  if(!list.length){
+    grid.innerHTML = ressources.length ? '<p style="color:var(--ink2)">Aucune ressource dans cette matière.</p>' : '<p style="color:var(--ink2)">Aucune ressource publiée pour le moment.</p>';
+    return;
+  }
+  grid.innerHTML = list.map(r=>`
+    <div class="res-card">
+      <span class="type">${r.type||''}</span>
+      <h3>${r.titre||''}</h3>
+      <p>${r.description||''}</p>
+      <div class="foot"><span>${r.pages?`PDF · ${r.pages} pages`:'PDF'}</span>${r.lien?`<a class="dl" href="${r.lien}" target="_blank" rel="noopener">Télécharger ↓</a>`:'<span class="dl" style="opacity:.5">Bientôt</span>'}</div>
+    </div>`).join('');
+}
 </script>
 </body>
 </html>
