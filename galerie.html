@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ressources — Club Réussir Ensemble</title>
-<meta name="description" content="Fiches, exercices et annales de la Collection BHDS pour les élèves de toutes les classes à Mamou.">
+<title>Galerie — Club Réussir Ensemble</title>
+<meta name="description" content="Galerie photo du Club Réussir Ensemble de Mamou : activités, événements et vie du Club, avec les commentaires des visiteurs.">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Club Réussir Ensemble — styles partagés */
@@ -76,21 +76,23 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
 .page-head{background:var(--navy-deep);color:#fff;padding:46px 0}
 .page-head h1{color:#fff;font-size:clamp(26px,4vw,36px)}
 .page-head p{color:#cfd8e3;margin-top:8px;max-width:560px}
-.bhds-strip{background:var(--gold);color:var(--navy-deep);font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;letter-spacing:.03em;padding:9px 0;text-align:center}
 
-.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-.res-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;gap:10px}
-.res-card .type{display:inline-flex;align-self:flex-start;background:var(--paper2);color:var(--navy);font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px}
-.res-card h3{font-size:16px}
-.res-card p{color:var(--ink2);font-size:13.5px;flex:1}
-.res-card .foot{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--ink2);border-top:1px solid var(--line);padding-top:10px}
-.res-card .dl{color:var(--red);font-weight:700}
-.res-card:nth-child(3n+1) .type{color:var(--red)}
-.res-card:nth-child(3n+2) .type{color:var(--green)}
-
-.subj-nav{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0}
-.subj-nav button{border:1.5px solid var(--line);background:#fff;padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink2);cursor:pointer}
-.subj-nav button.active,.subj-nav button:hover{background:var(--navy-deep);color:#fff;border-color:var(--navy-deep)}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.gal-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.gal-card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--paper2)}
+.gal-body{padding:16px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.gal-legende{color:var(--ink);font-size:14.5px}
+.gal-toggle{align-self:flex-start;border:none;background:none;color:var(--navy);font-weight:700;font-size:13px;cursor:pointer;padding:0}
+.gal-comments{display:none;border-top:1px solid var(--paper2);padding-top:10px;margin-top:4px}
+.gal-comments.open{display:block}
+.gal-comment-list{display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto;margin-bottom:10px}
+.gal-comment{font-size:13px;background:var(--paper2);border-radius:8px;padding:8px 10px}
+.gal-comment b{color:var(--navy-deep);font-size:12.5px}
+.gal-comment-form{display:flex;flex-direction:column;gap:6px}
+.gal-comment-form input,.gal-comment-form textarea{border:1.5px solid var(--line);border-radius:7px;padding:8px 10px;font-size:13px;font-family:inherit;background:var(--paper2)}
+.gal-comment-form textarea{resize:vertical;min-height:50px}
+.gal-comment-form button{align-self:flex-end;background:var(--navy);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer}
+.empty{color:var(--ink2);text-align:center;padding:40px 20px}
 </style>
 </head>
 <body>
@@ -103,10 +105,10 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
     <nav id="navLinks">
       <a href="index.html">Accueil</a>
       <a href="cours.html">Cours</a>
-      <a href="ressources.html" class="active">Ressources</a>
+      <a href="ressources.html">Ressources</a>
       <a href="videos.html">Vidéos</a>
       <a href="evenements.html">Événements</a>
-      <a href="galerie.html">Galerie</a>
+      <a href="galerie.html" class="active">Galerie</a>
       <a href="inscription.html">Inscription</a>
       <a href="apropos.html">À propos</a>
       <a href="suivi.html">Mon espace</a>
@@ -115,23 +117,18 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
   </div>
 </header>
 <div class="flag-rule"></div>
-<div class="bhds-strip" id="bhdsStrip">COLLECTION BHDS — Fiches conçues par le Club Réussir Ensemble</div>
 
 <section class="page-head">
   <div class="wrap">
-    <h1 id="pageTitle">Ressources pédagogiques</h1>
-    <p id="pageSubtitle">Fiches de cours, exercices corrigés et annales du Bac, tirés de la Collection BHDS et organisés par matière.</p>
+    <h1>Galerie photos</h1>
+    <p>Les temps forts du Club Réussir Ensemble en images. Laisse un commentaire sous une photo qui te plaît !</p>
   </div>
 </section>
 
 <section class="section" style="padding-top:0">
   <div class="wrap">
-    <div class="subj-nav" id="filters">
-      <button class="active" data-f="toutes">Toutes</button>
-    </div>
-
-    <div class="res-grid" id="grid">
-      <p style="color:var(--ink2)">Chargement des ressources…</p>
+    <div class="gal-grid" id="grid">
+      <p class="empty">Chargement de la galerie…</p>
     </div>
   </div>
 </section>
@@ -161,47 +158,82 @@ h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;line-height:1.15;color
   <div class="foot-bottom">© <span id="y"></span> Club Réussir Ensemble de Mamou.</div>
 </footer>
 
-<script type="module">
-import { fbDB, C_RESSOURCES, collection, query, orderBy, onSnapshot } from "./firebase.js";
-
+<script>
 document.getElementById('navToggle').onclick=()=>document.getElementById('navLinks').classList.toggle('open');
 document.getElementById('y').textContent=new Date().getFullYear();
+</script>
+
+<script type="module">
+import { fbDB, C_GAL, collection, doc, addDoc, query, orderBy, onSnapshot } from "./firebase.js";
 
 const grid = document.getElementById('grid');
-const filters = document.getElementById('filters');
-let ressources = [];
-let filtre = 'toutes';
+let photos = [];
 
-onSnapshot(query(collection(fbDB, C_RESSOURCES), orderBy('ordre','asc')), snap=>{
-  ressources = snap.docs.map(d=>({id:d.id, ...d.data()}));
-  renderFilters();
+onSnapshot(query(collection(fbDB, C_GAL), orderBy('ordre','asc')), snap => {
+  photos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   render();
 });
 
-function renderFilters(){
-  const matieres = [...new Set(ressources.map(r=>r.matiere).filter(Boolean))];
-  filters.innerHTML = ['<button data-f="toutes" class="'+(filtre==='toutes'?'active':'')+'">Toutes</button>']
-    .concat(matieres.map(m=>`<button data-f="${m}" class="${filtre===m?'active':''}">${m}</button>`)).join('');
-  filters.querySelectorAll('button').forEach(b=>{
-    b.onclick = ()=>{ filtre = b.dataset.f; renderFilters(); render(); };
+function render(){
+  if(!photos.length){
+    grid.innerHTML = '<p class="empty">Aucune photo publiée pour le moment — reviens bientôt !</p>';
+    return;
+  }
+  grid.innerHTML = photos.map(p => `
+    <div class="gal-card">
+      <img src="${p.url||''}" alt="${(p.legende||'Photo du Club').replace(/"/g,'')}" loading="lazy">
+      <div class="gal-body">
+        <div class="gal-legende">${p.legende||''}</div>
+        <button class="gal-toggle" data-toggle="${p.id}">💬 Voir les commentaires</button>
+        <div class="gal-comments" id="comments-${p.id}">
+          <div class="gal-comment-list" id="list-${p.id}"><p class="empty" style="padding:8px">Chargement…</p></div>
+          <form class="gal-comment-form" data-form="${p.id}">
+            <input name="nom" placeholder="Ton prénom" required maxlength="40">
+            <textarea name="texte" placeholder="Ton commentaire…" required maxlength="300"></textarea>
+            <button type="submit">Envoyer</button>
+          </form>
+        </div>
+      </div>
+    </div>`).join('');
+
+  document.querySelectorAll('[data-toggle]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.toggle;
+      const panel = document.getElementById('comments-'+id);
+      const isOpen = panel.classList.toggle('open');
+      btn.textContent = isOpen ? '💬 Masquer les commentaires' : '💬 Voir les commentaires';
+      if(isOpen && !panel.dataset.loaded){
+        panel.dataset.loaded = '1';
+        loadComments(id);
+      }
+    };
+  });
+
+  document.querySelectorAll('[data-form]').forEach(form => {
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = form.dataset.form;
+      const fd = new FormData(form);
+      const nom = fd.get('nom').trim();
+      const texte = fd.get('texte').trim();
+      if(!nom || !texte) return;
+      await addDoc(collection(fbDB, C_GAL, id, 'commentaires'), { nom, texte, createdAt: Date.now() });
+      form.reset();
+    });
   });
 }
 
-function render(){
-  const list = ressources.filter(r => filtre==='toutes' || r.matiere===filtre);
-  if(!list.length){
-    grid.innerHTML = ressources.length ? '<p style="color:var(--ink2)">Aucune ressource dans cette matière.</p>' : '<p style="color:var(--ink2)">Aucune ressource publiée pour le moment.</p>';
-    return;
-  }
-  grid.innerHTML = list.map(r=>`
-    <div class="res-card">
-      <span class="type">${r.type||''}</span>
-      <h3>${r.titre||''}</h3>
-      <p>${r.description||''}</p>
-      <div class="foot"><span>${r.pages?`PDF · ${r.pages} pages`:'PDF'}</span>${r.lien?`<a class="dl" href="${r.lien}" target="_blank" rel="noopener">Télécharger ↓</a>`:'<span class="dl" style="opacity:.5">Bientôt</span>'}</div>
-    </div>`).join('');
+function loadComments(photoId){
+  const list = document.getElementById('list-'+photoId);
+  onSnapshot(query(collection(fbDB, C_GAL, photoId, 'commentaires'), orderBy('createdAt','asc')), snap => {
+    const rows = snap.docs.map(d => d.data());
+    list.innerHTML = rows.length
+      ? rows.map(c => `<div class="gal-comment"><b>${c.nom||'Anonyme'}</b> — ${c.texte||''}</div>`).join('')
+      : '<p class="empty" style="padding:8px">Aucun commentaire pour le moment. Sois le premier !</p>';
+  });
 }
 </script>
+
 <script>
 (function(){
   var taps = 0, timer = null;
