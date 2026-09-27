@@ -180,6 +180,7 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
       <button data-tab="ressources">Ressources</button>
       <button data-tab="inscriptions">Inscriptions</button>
       <button data-tab="galerie">Galerie</button>
+      <button data-tab="liens">Réseaux sociaux</button>
     </div>
 
     <div id="tab-matieres" class="panel">
@@ -351,6 +352,22 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
             <div class="field"><label>Bandeau direct — bouton</label><input name="liveBtnText"></div>
           </div>
           <button class="btn btn-navy" type="submit">Enregistrer "Vidéos"</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="tab-liens" class="panel" style="display:none">
+      <h2>Réseaux sociaux du site (pied de page)</h2>
+      <div class="content-block">
+        <form id="configReseauxForm">
+          <div class="grid-2">
+            <div class="field"><label>Facebook — lien</label><input name="facebook" type="url" placeholder="https://www.facebook.com/..."></div>
+            <div class="field"><label>YouTube — lien</label><input name="youtube" type="url" placeholder="https://www.youtube.com/..."></div>
+            <div class="field"><label>WhatsApp — lien (wa.me/…)</label><input name="whatsapp" type="url" placeholder="https://wa.me/224xxxxxxxxx"></div>
+            <div class="field"><label>E-mail</label><input name="email" type="email" placeholder="contact@clubreussirensemble-mamou.com"></div>
+            <div class="field"><label>Localisation (Google Maps) — lien</label><input name="maps" type="url" placeholder="https://maps.google.com/..."></div>
+          </div>
+          <button class="btn btn-navy" type="submit">Enregistrer les réseaux sociaux</button>
         </form>
       </div>
     </div>
@@ -623,7 +640,7 @@ function startListeners(){
     renderObjectifs();
   });
 
-  ['accueil','apropos','videos'].forEach(async docId=>{
+  ['accueil','apropos','videos','reseaux'].forEach(async docId=>{
     const snap = await getDoc(doc(fbDB, C_CONFIG, docId));
     if(!snap.exists()) return;
     const form = document.getElementById('config'+docId.charAt(0).toUpperCase()+docId.slice(1)+'Form');
@@ -944,7 +961,7 @@ function formToObject(form){
   return o;
 }
 
-['configAccueilForm','configAproposForm','configVideosForm'].forEach(id=>{
+['configAccueilForm','configAproposForm','configVideosForm','configReseauxForm'].forEach(id=>{
   document.getElementById(id).addEventListener('submit', async e=>{
     e.preventDefault();
     const docId = id.replace('config','').replace('Form','').toLowerCase();
