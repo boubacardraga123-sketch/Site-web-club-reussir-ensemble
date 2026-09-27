@@ -130,6 +130,19 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
 .auth-box label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:5px}
 .auth-box input{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit}
 .err{color:var(--red);font-size:12.5px;margin-top:10px}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(7,26,56,.55);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;max-width:480px;width:100%;max-height:86vh;overflow-y:auto}
+.modal-box h3{font-size:16px;margin-bottom:14px}
+.modal-close{float:right;border:none;background:none;font-size:20px;cursor:pointer;color:var(--ink2);line-height:1}
+.lecon-item{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--paper2);border-radius:7px;padding:8px 10px;margin-bottom:6px;font-size:13px}
+.lecon-item span.type{font-size:11px;font-weight:700;color:var(--ink2);white-space:nowrap}
+.lecon-item button{border:none;background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:5px;cursor:pointer;flex-shrink:0}
+.lecon-form{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:flex-end}
+.lecon-form .field{display:flex;flex-direction:column;gap:5px;flex:1 1 140px}
+.lecon-form label{font-size:11.5px;font-weight:700;color:var(--ink2)}
+.lecon-form input,.lecon-form select{padding:9px 11px;border:1.5px solid var(--line);border-radius:7px;font-size:13.5px;font-family:inherit;background:var(--paper2)}
 </style>
 </head>
 <body>
@@ -419,6 +432,43 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
   </div>
 </div>
 
+<div class="modal-overlay" id="matiereEditOverlay">
+  <div class="modal-box">
+    <button class="modal-close" id="matiereEditClose" type="button">×</button>
+    <h3>Modifier la matière</h3>
+    <form id="matiereEditForm">
+      <input type="hidden" name="id">
+      <div class="grid-2">
+        <div class="field"><label>Nom</label><input name="nom" required></div>
+        <div class="field"><label>Encadreur</label><input name="prof"></div>
+        <div class="field"><label>Prix (GNF)</label><input name="prix" type="number" min="0"></div>
+      </div>
+      <button class="btn btn-navy" type="submit">Enregistrer</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="leconsOverlay">
+  <div class="modal-box">
+    <button class="modal-close" id="leconsClose" type="button">×</button>
+    <h3>Leçons — <span id="leconsMatiereNom"></span></h3>
+    <div id="leconsList"></div>
+    <form class="lecon-form" id="leconForm">
+      <input type="hidden" name="matiereId">
+      <div class="field"><label>Titre de la leçon</label><input name="titre" required placeholder="Ex. Les suites numériques"></div>
+      <div class="field" style="flex:0 0 140px">
+        <label>Type</label>
+        <select name="type">
+          <option value="video">Vidéo</option>
+          <option value="quiz">Quiz</option>
+          <option value="devoir">Devoir</option>
+        </select>
+      </div>
+      <button class="btn btn-navy" type="submit">Ajouter</button>
+    </form>
+  </div>
+</div>
+
 <script type="module">
 import { fbAuth, fbDB, C_MATIERES, C_PAIEMENTS, C_ELEVES, C_EVENEMENTS, C_EVALUATIONS,
          C_RESULTATS, C_OBJECTIFS, C_CONFIG, C_VIDEOS, C_EQUIPE, C_RESSOURCES, C_INSC, C_GAL,
@@ -426,7 +476,7 @@ import { fbAuth, fbDB, C_MATIERES, C_PAIEMENTS, C_ELEVES, C_EVENEMENTS, C_EVALUA
          updateDoc, deleteDoc, orderBy, query, onSnapshot, signInWithEmailAndPassword, signOut,
          onAuthStateChanged } from "./firebase.js";
 
-let eleves = [], evaluations = [];
+let eleves = [], evaluations = [], matieres = [];
 
 const loginView = document.getElementById('loginView');
 const adminView = document.getElementById('adminView');
@@ -471,15 +521,26 @@ function startListeners(){
   if(started) return; started = true;
 
   onSnapshot(query(collection(fbDB, C_MATIERES), orderBy('ordre','asc')), snap=>{
-    const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    document.getElementById('matieresBody').innerHTML = rows.length ? rows.map(m=>
+    matieres = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    document.getElementById('matieresBody').innerHTML = matieres.length ? matieres.map(m=>
       `<tr><td>${m.nom}</td><td>${m.prof||'—'}</td><td>${m.prix||0} GNF</td><td>${(m.lecons||[]).length}</td>
-       <td><button class="small-btn" data-delmat="${m.id}" style="background:var(--red)">Supprimer</button></td></tr>`
+       <td style="white-space:nowrap">
+         <button class="small-btn" data-editmat="${m.id}">Modifier</button>
+         <button class="small-btn" data-lecons="${m.id}" style="background:var(--gold);color:var(--navy-deep)">Leçons</button>
+         <button class="small-btn" data-delmat="${m.id}" style="background:var(--red)">Supprimer</button>
+       </td></tr>`
     ).join('') : '<tr><td colspan="5">Aucune matière.</td></tr>';
 
     document.querySelectorAll('[data-delmat]').forEach(b=>{
       b.onclick = ()=> { if(confirm('Supprimer cette matière ? Les leçons associées seront perdues.')) deleteDoc(doc(fbDB, C_MATIERES, b.dataset.delmat)); };
     });
+    document.querySelectorAll('[data-editmat]').forEach(b=>{
+      b.onclick = ()=> openMatiereEdit(b.dataset.editmat);
+    });
+    document.querySelectorAll('[data-lecons]').forEach(b=>{
+      b.onclick = ()=> openLecons(b.dataset.lecons);
+    });
+    if(leconsOverlay && leconsOverlay.classList.contains('open')) renderLeconsList();
   });
 
   onSnapshot(query(collection(fbDB, C_PAIEMENTS), orderBy('createdAt','desc')), snap=>{
@@ -758,6 +819,80 @@ document.getElementById('matiereForm').addEventListener('submit', async e=>{
     createdAt: Date.now()
   });
   e.target.reset();
+});
+
+// ── Modifier une matière (nom / encadreur / prix) ──
+const matiereEditOverlay = document.getElementById('matiereEditOverlay');
+const matiereEditForm = document.getElementById('matiereEditForm');
+
+function openMatiereEdit(id){
+  const m = matieres.find(x=>x.id===id);
+  if(!m) return;
+  matiereEditForm.elements['id'].value = id;
+  matiereEditForm.elements['nom'].value = m.nom||'';
+  matiereEditForm.elements['prof'].value = m.prof||'';
+  matiereEditForm.elements['prix'].value = m.prix||0;
+  matiereEditOverlay.classList.add('open');
+}
+document.getElementById('matiereEditClose').onclick = ()=> matiereEditOverlay.classList.remove('open');
+matiereEditOverlay.onclick = e=>{ if(e.target===matiereEditOverlay) matiereEditOverlay.classList.remove('open'); };
+
+matiereEditForm.addEventListener('submit', async e=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const id = fd.get('id');
+  await updateDoc(doc(fbDB, C_MATIERES, id), {
+    nom: fd.get('nom').trim(),
+    prof: (fd.get('prof')||'').trim(),
+    prix: Number(fd.get('prix'))||0
+  });
+  matiereEditOverlay.classList.remove('open');
+});
+
+// ── Gérer les leçons d'une matière ──
+const leconsOverlay = document.getElementById('leconsOverlay');
+const leconForm = document.getElementById('leconForm');
+let leconsMatiereId = null;
+
+function renderLeconsList(){
+  const m = matieres.find(x=>x.id===leconsMatiereId);
+  const lecons = (m && m.lecons) || [];
+  const typeLabels = {video:'Vidéo', quiz:'Quiz', devoir:'Devoir'};
+  document.getElementById('leconsList').innerHTML = lecons.length ? lecons.map((l,i)=>
+    `<div class="lecon-item"><span>${l.titre}</span><span class="type">${typeLabels[l.type]||l.type}</span><button type="button" data-dellecon="${i}">Suppr.</button></div>`
+  ).join('') : '<p style="color:var(--ink2);font-size:13px">Aucune leçon pour le moment.</p>';
+
+  document.querySelectorAll('[data-dellecon]').forEach(b=>{
+    b.onclick = async ()=>{
+      const m2 = matieres.find(x=>x.id===leconsMatiereId);
+      const lecons2 = (m2.lecons||[]).slice();
+      lecons2.splice(Number(b.dataset.dellecon), 1);
+      await updateDoc(doc(fbDB, C_MATIERES, leconsMatiereId), { lecons: lecons2 });
+    };
+  });
+}
+
+function openLecons(id){
+  leconsMatiereId = id;
+  const m = matieres.find(x=>x.id===id);
+  document.getElementById('leconsMatiereNom').textContent = m ? m.nom : '';
+  leconForm.elements['matiereId'].value = id;
+  renderLeconsList();
+  leconsOverlay.classList.add('open');
+}
+document.getElementById('leconsClose').onclick = ()=> leconsOverlay.classList.remove('open');
+leconsOverlay.onclick = e=>{ if(e.target===leconsOverlay) leconsOverlay.classList.remove('open'); };
+
+leconForm.addEventListener('submit', async e=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const id = fd.get('matiereId');
+  const m = matieres.find(x=>x.id===id);
+  const lecons = (m && m.lecons) ? m.lecons.slice() : [];
+  lecons.push({ titre: fd.get('titre').trim(), type: fd.get('type') });
+  await updateDoc(doc(fbDB, C_MATIERES, id), { lecons });
+  leconForm.reset();
+  leconForm.elements['matiereId'].value = id;
 });
 
 document.getElementById('evenementForm').addEventListener('submit', async e=>{
