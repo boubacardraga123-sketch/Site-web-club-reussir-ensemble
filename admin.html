@@ -104,6 +104,18 @@ body{background:var(--paper2)}
 .grid-2 label{font-size:11.5px;font-weight:700;color:var(--ink2)}
 .grid-2 input{padding:9px 11px;border:1.5px solid var(--line);border-radius:7px;font-size:13.5px;font-family:inherit;background:var(--paper2)}
 
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700}
+.pill.attente{background:#fff3cd;color:#8a6300}
+.pill.accepte,.pill.ok{background:#e7f6ec;color:var(--green)}
+.pill.refuse{background:#fdeaea;color:var(--red)}
+.insc-actions select{padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;font-size:12.5px;font-family:inherit}
+
+.gal-thumb{width:70px;height:52px;object-fit:cover;border-radius:6px;background:var(--paper2)}
+.gal-com-toggle{border:none;background:none;color:var(--navy);font-weight:700;font-size:12.5px;cursor:pointer;padding:0}
+.gal-com-panel{display:none;margin-top:6px}
+.gal-com-panel.open{display:block}
+.gal-com-item{font-size:12.5px;background:var(--paper2);border-radius:6px;padding:6px 8px;margin-bottom:4px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{text-align:left;color:var(--ink2);font-size:11.5px;text-transform:uppercase;padding:8px 10px;border-bottom:2px solid var(--line)}
 td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
@@ -153,6 +165,8 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
       <button data-tab="videos">Vidéos</button>
       <button data-tab="equipe">Équipe</button>
       <button data-tab="ressources">Ressources</button>
+      <button data-tab="inscriptions">Inscriptions</button>
+      <button data-tab="galerie">Galerie</button>
     </div>
 
     <div id="tab-matieres" class="panel">
@@ -164,8 +178,8 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
         <button class="btn btn-navy" type="submit">Ajouter</button>
       </form>
       <table>
-        <thead><tr><th>Matière</th><th>Encadreur</th><th>Prix</th><th>Leçons</th></tr></thead>
-        <tbody id="matieresBody"><tr><td colspan="4">Chargement…</td></tr></tbody>
+        <thead><tr><th>Matière</th><th>Encadreur</th><th>Prix</th><th>Leçons</th><th></th></tr></thead>
+        <tbody id="matieresBody"><tr><td colspan="5">Chargement…</td></tr></tbody>
       </table>
     </div>
 
@@ -180,8 +194,8 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
     <div id="tab-eleves" class="panel" style="display:none">
       <h2>Élèves inscrits</h2>
       <table>
-        <thead><tr><th>Nom</th><th>Classe</th><th>Téléphone</th><th>E-mail</th></tr></thead>
-        <tbody id="elevesBody"><tr><td colspan="4">Chargement…</td></tr></tbody>
+        <thead><tr><th>Nom</th><th>Classe</th><th>Téléphone</th><th>E-mail</th><th></th></tr></thead>
+        <tbody id="elevesBody"><tr><td colspan="5">Chargement…</td></tr></tbody>
       </table>
     </div>
 
@@ -238,16 +252,16 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
         <button class="btn btn-navy" type="submit">Enregistrer</button>
       </form>
       <table>
-        <thead><tr><th>Élève</th><th>Évaluation</th><th>Note</th></tr></thead>
-        <tbody id="resultatsBody"><tr><td colspan="3">Chargement…</td></tr></tbody>
+        <thead><tr><th>Élève</th><th>Évaluation</th><th>Note</th><th></th></tr></thead>
+        <tbody id="resultatsBody"><tr><td colspan="4">Chargement…</td></tr></tbody>
       </table>
     </div>
 
     <div id="tab-objectifs" class="panel" style="display:none">
       <h2>Objectifs des élèves</h2>
       <table>
-        <thead><tr><th>Élève</th><th>Objectif</th><th>Statut</th></tr></thead>
-        <tbody id="objectifsBody"><tr><td colspan="3">Chargement…</td></tr></tbody>
+        <thead><tr><th>Élève</th><th>Objectif</th><th>Statut</th><th></th></tr></thead>
+        <tbody id="objectifsBody"><tr><td colspan="4">Chargement…</td></tr></tbody>
       </table>
     </div>
 
@@ -381,12 +395,33 @@ td{padding:10px;border-bottom:1px solid var(--paper2);vertical-align:top}
         <tbody id="ressourcesBody"><tr><td colspan="4">Chargement…</td></tr></tbody>
       </table>
     </div>
+
+    <div id="tab-inscriptions" class="panel" style="display:none">
+      <h2>Fiches d'inscription reçues</h2>
+      <table>
+        <thead><tr><th>Nom</th><th>Contact</th><th>Classe</th><th>Message</th><th>Statut</th><th>Décision</th><th>Contacter</th><th></th></tr></thead>
+        <tbody id="inscriptionsBody"><tr><td colspan="8">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+
+    <div id="tab-galerie" class="panel" style="display:none">
+      <h2>Ajouter une photo</h2>
+      <form id="galerieForm" class="row-form">
+        <div class="field" style="flex:1 1 300px"><label>Lien de l'image (URL)</label><input name="url" type="url" required placeholder="https://…"></div>
+        <div class="field" style="flex:1 1 300px"><label>Légende</label><input name="legende" placeholder="Ex. Remise des prix du concours de maths"></div>
+        <button class="btn btn-navy" type="submit">Ajouter</button>
+      </form>
+      <table>
+        <thead><tr><th>Photo</th><th>Légende</th><th>Commentaires</th><th></th></tr></thead>
+        <tbody id="galerieBody"><tr><td colspan="4">Chargement…</td></tr></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <script type="module">
 import { fbAuth, fbDB, C_MATIERES, C_PAIEMENTS, C_ELEVES, C_EVENEMENTS, C_EVALUATIONS,
-         C_RESULTATS, C_OBJECTIFS, C_CONFIG, C_VIDEOS, C_EQUIPE, C_RESSOURCES,
+         C_RESULTATS, C_OBJECTIFS, C_CONFIG, C_VIDEOS, C_EQUIPE, C_RESSOURCES, C_INSC, C_GAL,
          collection, doc, getDoc, setDoc, addDoc,
          updateDoc, deleteDoc, orderBy, query, onSnapshot, signInWithEmailAndPassword, signOut,
          onAuthStateChanged } from "./firebase.js";
@@ -438,8 +473,13 @@ function startListeners(){
   onSnapshot(query(collection(fbDB, C_MATIERES), orderBy('ordre','asc')), snap=>{
     const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
     document.getElementById('matieresBody').innerHTML = rows.length ? rows.map(m=>
-      `<tr><td>${m.nom}</td><td>${m.prof||'—'}</td><td>${m.prix||0} GNF</td><td>${(m.lecons||[]).length}</td></tr>`
-    ).join('') : '<tr><td colspan="4">Aucune matière.</td></tr>';
+      `<tr><td>${m.nom}</td><td>${m.prof||'—'}</td><td>${m.prix||0} GNF</td><td>${(m.lecons||[]).length}</td>
+       <td><button class="small-btn" data-delmat="${m.id}" style="background:var(--red)">Supprimer</button></td></tr>`
+    ).join('') : '<tr><td colspan="5">Aucune matière.</td></tr>';
+
+    document.querySelectorAll('[data-delmat]').forEach(b=>{
+      b.onclick = ()=> { if(confirm('Supprimer cette matière ? Les leçons associées seront perdues.')) deleteDoc(doc(fbDB, C_MATIERES, b.dataset.delmat)); };
+    });
   });
 
   onSnapshot(query(collection(fbDB, C_PAIEMENTS), orderBy('createdAt','desc')), snap=>{
@@ -447,19 +487,24 @@ function startListeners(){
     document.getElementById('paiementsBody').innerHTML = rows.length ? rows.map(p=>
       `<tr><td>${(p.uid||'').slice(0,8)}…</td><td>${p.matiereNom||p.matiereId}</td><td>${p.montant||0} GNF</td>
        <td><span class="pill ${p.statut==='valide'?'ok':'attente'}">${p.statut||'en attente'}</span></td>
-       <td>${p.statut!=='valide' ? `<button class="small-btn" data-valide="${p.id}">Valider</button>` : ''}</td></tr>`
+       <td>${p.statut!=='valide' ? `<button class="small-btn" data-valide="${p.id}">Valider</button>` : ''}
+       <button class="small-btn" data-delpaie="${p.id}" style="background:var(--red)">Supprimer</button></td></tr>`
     ).join('') : '<tr><td colspan="5">Aucun paiement.</td></tr>';
 
     document.querySelectorAll('[data-valide]').forEach(b=>{
       b.onclick = ()=> updateDoc(doc(fbDB, C_PAIEMENTS, b.dataset.valide), { statut: 'valide' });
+    });
+    document.querySelectorAll('[data-delpaie]').forEach(b=>{
+      b.onclick = ()=> { if(confirm('Supprimer ce paiement ?')) deleteDoc(doc(fbDB, C_PAIEMENTS, b.dataset.delpaie)); };
     });
   });
 
   onSnapshot(collection(fbDB, C_ELEVES), snap=>{
     eleves = snap.docs.map(d=>({uid:d.id, ...d.data()}));
     document.getElementById('elevesBody').innerHTML = eleves.length ? eleves.map(e=>
-      `<tr><td>${e.prenom||''} ${e.nom||''}</td><td>${e.classe||'—'}</td><td>${e.telephone||'—'}</td><td>${e.email||'—'}</td></tr>`
-    ).join('') : '<tr><td colspan="4">Aucun élève inscrit.</td></tr>';
+      `<tr><td>${e.prenom||''} ${e.nom||''}</td><td>${e.classe||'—'}</td><td>${e.telephone||'—'}</td><td>${e.email||'—'}</td>
+       <td><button class="small-btn" data-delel="${e.uid}" style="background:var(--red)">Supprimer</button></td></tr>`
+    ).join('') : '<tr><td colspan="5">Aucun élève inscrit.</td></tr>';
 
     document.getElementById('eleveSelect').innerHTML = eleves.length ? eleves.map(e=>
       `<option value="${e.uid}">${e.prenom||''} ${e.nom||''}</option>`
@@ -467,6 +512,10 @@ function startListeners(){
 
     renderObjectifs();
     renderResultats();
+
+    document.querySelectorAll('[data-delel]').forEach(b=>{
+      b.onclick = ()=> { if(confirm("Supprimer cet élève ? Cela ne supprime pas son compte de connexion, seulement sa fiche.")) deleteDoc(doc(fbDB, C_ELEVES, b.dataset.delel)); };
+    });
   });
 
   onSnapshot(query(collection(fbDB, C_EVENEMENTS), orderBy('date','asc')), snap=>{
@@ -559,6 +608,112 @@ function startListeners(){
       b.onclick = ()=> { if(confirm('Supprimer cette ressource ?')) deleteDoc(doc(fbDB, C_RESSOURCES, b.dataset.delres)); };
     });
   });
+
+  onSnapshot(query(collection(fbDB, C_INSC), orderBy('dateInscription','desc')), snap=>{
+    const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    const statutPill = s => `<span class="pill ${s==='traite'?'ok':'attente'}">${s==='traite'?'Traité':'Nouveau'}</span>`;
+    const decisionPill = d => d==='accepte' ? '<span class="pill accepte">Accepté</span>'
+                             : d==='refuse' ? '<span class="pill refuse">Refusé</span>'
+                             : '<span class="pill attente">En attente</span>';
+
+    function messageFor(i){
+      const prenom = i.prenom || '';
+      if(i.decision === 'accepte'){
+        return `Bonjour ${prenom}, bonne nouvelle : ta fiche d'inscription au Club Réussir Ensemble de Mamou est acceptée ! Tu peux maintenant créer ton compte élève sur ${location.origin}${location.pathname.replace('admin.html','suivi.html')} pour accéder à tes cours. À bientôt au Club !`;
+      }
+      if(i.decision === 'refuse'){
+        return `Bonjour ${prenom}, merci pour ton intérêt pour le Club Réussir Ensemble de Mamou. Pour le moment nous ne pouvons pas donner suite à ta demande d'inscription. N'hésite pas à nous recontacter plus tard.`;
+      }
+      return `Bonjour ${prenom}, nous avons bien reçu ta fiche d'inscription au Club Réussir Ensemble de Mamou. Un formateur reviendra vers toi très bientôt.`;
+    }
+
+    function waNumber(tel){
+      let d = (tel||'').replace(/[^0-9]/g, '');
+      if(!d) return '';
+      if(d.startsWith('00')) d = d.slice(2);
+      if(d.startsWith('224')) return d;
+      if(d.startsWith('0')) d = d.slice(1);
+      return '224' + d;
+    }
+
+    document.getElementById('inscriptionsBody').innerHTML = rows.length ? rows.map(i=>{
+      const msg = messageFor(i);
+      const wa = waNumber(i.telephone);
+      const waHref = wa ? `https://wa.me/${wa}?text=${encodeURIComponent(msg)}` : '';
+      const mailHref = i.email ? `mailto:${i.email}?subject=${encodeURIComponent('Ton inscription au Club Réussir Ensemble')}&body=${encodeURIComponent(msg)}` : '';
+      return `
+      <tr>
+        <td>${i.prenom||''} ${i.nom||''}</td>
+        <td>${i.telephone||'—'}${i.email?'<br>'+i.email:''}</td>
+        <td>${i.classe||'—'}${i.filiere?' · '+i.filiere:''}</td>
+        <td style="max-width:220px">${i.message||'—'}</td>
+        <td>${statutPill(i.statut)}</td>
+        <td class="insc-actions">
+          ${decisionPill(i.decision)}
+          <select data-decision="${i.id}">
+            <option value="en_attente" ${i.decision==='en_attente'?'selected':''}>En attente</option>
+            <option value="accepte" ${i.decision==='accepte'?'selected':''}>Accepté</option>
+            <option value="refuse" ${i.decision==='refuse'?'selected':''}>Refusé</option>
+          </select>
+        </td>
+        <td>
+          ${waHref?`<a class="small-btn" style="background:#25D366;display:inline-block;margin-bottom:4px" href="${waHref}" target="_blank" rel="noopener">WhatsApp</a><br>`:''}
+          ${mailHref?`<a class="small-btn" style="background:var(--navy);display:inline-block" href="${mailHref}">E-mail</a>`:''}
+          ${!waHref && !mailHref ? '—' : ''}
+        </td>
+        <td><button class="small-btn" data-delinsc="${i.id}" style="background:var(--red)">Supprimer</button></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="8">Aucune fiche d’inscription pour le moment.</td></tr>';
+
+    document.querySelectorAll('[data-decision]').forEach(sel=>{
+      sel.onchange = ()=> updateDoc(doc(fbDB, C_INSC, sel.dataset.decision), { decision: sel.value, statut: 'traite' });
+    });
+    document.querySelectorAll('[data-delinsc]').forEach(b=>{
+      b.onclick = ()=> { if(confirm('Supprimer cette fiche ?')) deleteDoc(doc(fbDB, C_INSC, b.dataset.delinsc)); };
+    });
+  });
+
+  onSnapshot(query(collection(fbDB, C_GAL), orderBy('ordre','asc')), snap=>{
+    const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    document.getElementById('galerieBody').innerHTML = rows.length ? rows.map(p=>`
+      <tr>
+        <td><img class="gal-thumb" src="${p.url||''}" alt=""></td>
+        <td>${p.legende||'—'}</td>
+        <td>
+          <button class="gal-com-toggle" data-comtoggle="${p.id}">Voir les commentaires</button>
+          <div class="gal-com-panel" id="com-panel-${p.id}"></div>
+        </td>
+        <td><button class="small-btn" data-delphoto="${p.id}" style="background:var(--red)">Supprimer</button></td>
+      </tr>`).join('') : '<tr><td colspan="4">Aucune photo.</td></tr>';
+
+    document.querySelectorAll('[data-delphoto]').forEach(b=>{
+      b.onclick = ()=> { if(confirm('Supprimer cette photo et ses commentaires ?')) deleteDoc(doc(fbDB, C_GAL, b.dataset.delphoto)); };
+    });
+    document.querySelectorAll('[data-comtoggle]').forEach(b=>{
+      b.onclick = ()=>{
+        const id = b.dataset.comtoggle;
+        const panel = document.getElementById('com-panel-'+id);
+        const open = panel.classList.toggle('open');
+        b.textContent = open ? 'Masquer les commentaires' : 'Voir les commentaires';
+        if(open && !panel.dataset.loaded){
+          panel.dataset.loaded = '1';
+          onSnapshot(query(collection(fbDB, C_GAL, id, 'commentaires'), orderBy('createdAt','asc')), csnap=>{
+            const coms = csnap.docs.map(d=>({id:d.id, ...d.data()}));
+            panel.innerHTML = coms.length ? coms.map(c=>
+              `<div class="gal-com-item"><span><b>${c.nom||'Anonyme'}</b> — ${c.texte||''}</span><button class="small-btn" data-delcom="${id}|${c.id}" style="background:var(--red)">✕</button></div>`
+            ).join('') : '<p style="font-size:12.5px;color:var(--ink2)">Aucun commentaire.</p>';
+
+            panel.querySelectorAll('[data-delcom]').forEach(db=>{
+              db.onclick = ()=>{
+                const [pid, cid] = db.dataset.delcom.split('|');
+                deleteDoc(doc(fbDB, C_GAL, pid, 'commentaires', cid));
+              };
+            });
+          });
+        }
+      };
+    });
+  });
 }
 
 function nomEleve(uid){
@@ -570,15 +725,25 @@ function renderResultats(){
   const resultats = window.__resultats || [];
   document.getElementById('resultatsBody').innerHTML = resultats.length ? resultats.map(r=>{
     const ev = evaluations.find(e=>e.id===r.evaluationId);
-    return `<tr><td>${nomEleve(r.uid)}</td><td>${ev?ev.titre:(r.evaluationId||'—')}</td><td>${r.note}${ev?'/'+(ev.noteSur||20):''}</td></tr>`;
-  }).join('') : '<tr><td colspan="3">Aucun résultat saisi.</td></tr>';
+    return `<tr><td>${nomEleve(r.uid)}</td><td>${ev?ev.titre:(r.evaluationId||'—')}</td><td>${r.note}${ev?'/'+(ev.noteSur||20):''}</td>
+      <td><button class="small-btn" data-delres2="${r.id}" style="background:var(--red)">Supprimer</button></td></tr>`;
+  }).join('') : '<tr><td colspan="4">Aucun résultat saisi.</td></tr>';
+
+  document.querySelectorAll('[data-delres2]').forEach(b=>{
+    b.onclick = ()=> { if(confirm('Supprimer ce résultat ?')) deleteDoc(doc(fbDB, C_RESULTATS, b.dataset.delres2)); };
+  });
 }
 
 function renderObjectifs(){
   const objectifs = window.__objectifs || [];
   document.getElementById('objectifsBody').innerHTML = objectifs.length ? objectifs.map(o=>
-    `<tr><td>${nomEleve(o.uid)}</td><td>${o.texte||''}</td><td><span class="pill ${o.fait?'ok':'attente'}">${o.fait?'Atteint':'En cours'}</span></td></tr>`
-  ).join('') : '<tr><td colspan="3">Aucun objectif enregistré.</td></tr>';
+    `<tr><td>${nomEleve(o.uid)}</td><td>${o.texte||''}</td><td><span class="pill ${o.fait?'ok':'attente'}">${o.fait?'Atteint':'En cours'}</span></td>
+     <td><button class="small-btn" data-delobj="${o.id}" style="background:var(--red)">Supprimer</button></td></tr>`
+  ).join('') : '<tr><td colspan="4">Aucun objectif enregistré.</td></tr>';
+
+  document.querySelectorAll('[data-delobj]').forEach(b=>{
+    b.onclick = ()=> { if(confirm('Supprimer cet objectif ?')) deleteDoc(doc(fbDB, C_OBJECTIFS, b.dataset.delobj)); };
+  });
 }
 
 document.getElementById('matiereForm').addEventListener('submit', async e=>{
@@ -692,6 +857,18 @@ document.getElementById('ressourceForm').addEventListener('submit', async e=>{
     pages: Number(fd.get('pages'))||0,
     lien: (fd.get('lien')||'').trim(),
     description: (fd.get('description')||'').trim(),
+    ordre: Date.now(),
+    createdAt: Date.now()
+  });
+  e.target.reset();
+});
+
+document.getElementById('galerieForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  await addDoc(collection(fbDB, C_GAL), {
+    url: fd.get('url').trim(),
+    legende: (fd.get('legende')||'').trim(),
     ordre: Date.now(),
     createdAt: Date.now()
   });
