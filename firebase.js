@@ -43,6 +43,7 @@ export const C_CONFIG      = 'site_config';
 export const C_VIDEOS      = 'site_videos';
 export const C_EQUIPE      = 'site_equipe';
 export const C_RESSOURCES  = 'site_ressources';
+export const C_GAL         = 'site_galerie';
 
 /* ── Fonctions Firestore / Auth ré-exportées pour que les pages
    n'aient qu'un seul fichier à importer ── */
@@ -52,3 +53,4 @@ export {
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
   signOut, onAuthStateChanged
 };
+
