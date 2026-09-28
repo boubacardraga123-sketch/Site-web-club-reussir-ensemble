@@ -43,6 +43,7 @@ export const C_RESSOURCES      = 'site_ressources';
 export const C_GAL             = 'site_galerie';
 export const C_BLOG            = 'site_blog_articles';
 export const C_BLOG_BROUILLONS = 'site_blog_brouillons';
+export const C_OLY_INSC        = 'site_olympiades_inscriptions';
 
 /* ── Fonctions Firestore / Auth ré-exportées pour que les pages
    n'aient qu'un seul fichier à importer ── */
